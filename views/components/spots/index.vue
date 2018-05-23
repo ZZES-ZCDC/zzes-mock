@@ -35,7 +35,7 @@ export default {
   },
   mounted () {
     this.$el.parentNode.style.position = 'relative'
-    this.$el.parentNode.style.overflow = 'hidden'
+    this.$el.parentNode.style.overflowY = 'auto'
     for (let i = 0; i < this.size; i++) {
       this.items.push(this.getItem(i, this.size))
     }

@@ -22,6 +22,10 @@ const codeMap = {
  * 返回体封装
  */
 const utilFn = {
+  /**
+   * 成功返回体
+   * @param {*} data 
+   */
   resuccess (data) {
     return {
       code: 200,
@@ -30,6 +34,13 @@ const utilFn = {
       data: data || null
     }
   },
+  
+  /**
+   * 错误返回体
+   * @param {*} message 
+   * @param {*} code 
+   * @param {*} data 
+   */
   refail (message, code, data) {
     return {
       code: code || -1,

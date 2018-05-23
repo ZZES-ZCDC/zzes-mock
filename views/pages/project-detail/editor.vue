@@ -10,22 +10,58 @@
           <h2>{{isEdit ? $t('p.detail.editor.title[0]') : $t('p.detail.editor.title[1]')}}</h2>
           <div class="em-editor__form">
             <Form label-position="top">
-              <Form-item label="Method">
-                <i-select v-model="temp.method">
-                  <Option v-for="item in methods" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </i-select>
-              </Form-item>
-              <Form-item label="URL">
-                <i-input v-model="temp.url">
-                  <span slot="prepend">/</span>
-                </i-input>
-              </Form-item>
+              <!-- line 1 -->
+              <Row>
+                <Col span="12">
+                  <!-- 请求方法选择 -->
+                  <Form-item label="Method">
+                    <i-select v-model="temp.method">
+                      <Option v-for="item in methods" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </i-select>
+                  </Form-item>
+                </Col>
+                <Col span="12">
+                  <!-- 请求url -->
+                  <Form-item label="URL">
+                    <i-input v-model="temp.url">
+                      <span slot="prepend">/</span>
+                    </i-input>
+                  </Form-item>
+                </Col>  
+              </Row>
+              <!-- line 2 -->
+              <!-- 请求描述 -->
               <Form-item :label="$t('p.detail.columns[0]')">
                 <i-input v-model="temp.description"></i-input>
-              </Form-item>
+              </Form-item>  
+              <!-- 是否自动关闭 -->
               <Form-item :label="$t('p.detail.editor.autoClose')" v-if="isEdit">
                 <i-switch v-model="autoClose"></i-switch>
               </Form-item>
+              
+              <!-- 参数列表 -->
+              <Form-item :label="$t('p.detail.editor.paramsList')">
+                <Button style="width:100%" type="ghost" @click="handleAdd">+</Button>
+                <div class="box">
+                  <div v-for="(item, index) in formDynamic.items" :key="index" v-if="item.status">
+                    <Row>
+                      <Col span="9">
+                        <Input type="text" v-model="item.value" placeholder="Enter something..."/>
+                      </Col>
+                      <Col span="9">
+                        <i-select v-model="item.paramType">
+                          <Option v-for="item in paramTypes" :value="item.type" :key="item.type">{{ item.type }}</Option>
+                        </i-select>
+                      </Col>
+                      <Col span="4" offset="1">
+                        <Button type="ghost" @click="handleRemove(index)">-</Button>
+                      </Col>
+                    </Row>
+                  </div>         
+                </div>
+                <Button type="ghost" @click="push">push</Button>
+              </Form-item>
+              <!-- 提交按钮 -->
               <Form-item>
                 <Button type="primary" long @click="submit">{{isEdit ? $t('p.detail.editor.action[0]') : $t('p.detail.editor.action[1]')}}</Button>
               </Form-item>
@@ -34,7 +70,8 @@
           <div class="em-editor__control">
             <div class="em-proj-detail__switcher">
               <ul>
-                <li @click="format">{{$t('p.detail.editor.control[0]')}}</li>
+                <!-- 格式化 预览 关闭 三个按钮 -->
+                <li @click="format">{{$t('p.detail.editor.control[0]')}}</li> 
                 <li @click="preview" v-if="isEdit">{{$t('p.detail.editor.control[1]')}}</li>
                 <li @click="close">{{$t('p.detail.editor.control[2]')}}</li>
               </ul>
@@ -75,11 +112,25 @@ export default {
         { label: 'delete', value: 'delete' },
         { label: 'patch', value: 'patch' }
       ],
+      paramTypes: [
+        { type: 'String' },
+        { type: 'Number' },
+        { type: 'Boolean' }
+      ],
       temp: {
         url: '',
         mode: '',
         method: '',
         description: ''
+      },
+      index: 1,
+      formDynamic: {
+        items: [{
+          value: '',
+          paramType: '',
+          index: 1,
+          status: 1
+        }]
       }
     }
   },
@@ -200,6 +251,26 @@ export default {
     },
     preview () {
       window.open(this.$parent.baseUrl + this.value.url + '#!method=' + this.value.method)
+    },
+    handleAdd () {
+      this.index++
+      this.formDynamic.items.push({
+        value: '',
+        index: this.index,
+        status: 1
+      })
+    },
+    handleRemove (index) {
+      this.formDynamic.items[index].status = 0
+    },
+    push () {
+      let arr = []
+      this.formDynamic.items.map((v, i) => {
+        if (v.status === 1) {
+          arr.push(v)
+        }
+      })
+      console.log(arr)
     }
   }
 }
