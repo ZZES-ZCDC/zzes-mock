@@ -8,6 +8,13 @@ const Mock = require('mockjs')
 const axios = require('axios')
 const config = require('config')
 const pathToRegexp = require('path-to-regexp')
+const Parameter = require('parameter')
+const parameter = new Parameter({
+  translate: function() {
+    let args = Array.prototype.slice.call(arguments)
+    return I18n.t.apply(I18n, args)
+  }
+})
 
 const util = require('../util')
 const ft = require('../models/fields_table')
@@ -202,21 +209,22 @@ module.exports = class MockController {
    * 获取 Mock 接口
    * @param {*} ctx
    */
-
   static async getMockAPI (ctx) {
-    const { query, body } = ctx.request
-    const method = ctx.method.toLowerCase()
+    const { query, body } = ctx.request // 获取参数
+    const method = ctx.method.toLowerCase() // 请求方法小写
     const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback')
-    let { projectId, mockURL } = ctx.pathNode
-    const redisKey = 'project:' + projectId
+    let { projectId, mockURL } = ctx.pathNode // 取出projectId 和 mockURL
+    const redisKey = 'project:' + projectId 
     let apiData, apis, api
 
+    // 读取api
     apis = await redis.get(redisKey)
 
-    if (apis) {
+    if (apis) { // 如果存在api，则解析api
       apis = JSON.parse(apis)
-    } else {
+    } else { // 如果没有去数据库里查找对应的信息
       apis = await MockProxy.find({ project: projectId })
+      // 如果存在，则存入redis
       if (apis[0]) await redis.set(redisKey, JSON.stringify(apis), 'EX', 60 * 30)
     }
 
@@ -225,13 +233,14 @@ module.exports = class MockController {
     }
 
     api = apis.filter((item) => {
+      // 格式转换
       const url = item.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
-      return item.method === method && pathToRegexp(url).test(mockURL)
+      return item.method === method && pathToRegexp(url).test(mockURL) 
     })[0]
-
     if (!api) ctx.throw(404)
 
     Mock.Handler.function = function (options) {
+      // 转换格式
       const mockUrl = api.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
       options.Mock = Mock
       options._req = ctx.request
@@ -257,6 +266,7 @@ module.exports = class MockController {
         return
       }
     } else {
+      // 开个虚拟机解析mock模板，生成数据
       const vm = new VM({
         timeout: 1000,
         sandbox: {
@@ -265,10 +275,9 @@ module.exports = class MockController {
           template: new Function(`return ${api.mode}`) // eslint-disable-line
         }
       })
-
       vm.run('Mock.mock(new Function("return " + mode)())') // 数据验证，检测 setTimeout 等方法
       apiData = vm.run('Mock.mock(template())') // 解决正则表达式失效的问题
-
+      
       /* istanbul ignore else */
       if (apiData._res) { // 自定义响应 Code
         let _res = apiData._res

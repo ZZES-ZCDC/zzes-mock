@@ -9,7 +9,11 @@ const { createBundleRenderer } = require('vue-server-renderer')
 const resolve = file => path.resolve(__dirname, file)
 const isProd = process.env.NODE_ENV === 'production'
 const templatePath = resolve('../views/index.html')
-
+/**
+ * vue服务端渲染
+ * @param {*} bundle 
+ * @param {*} options 
+ */
 function createRenderer (bundle, options) {
   // https://github.com/vuejs/vue/blob/dev/packages/vue-server-renderer/README.md#why-use-bundlerenderer
   return createBundleRenderer(bundle, Object.assign(options, {

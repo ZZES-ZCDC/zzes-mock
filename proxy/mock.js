@@ -11,6 +11,9 @@ module.exports = class MockProxy {
     return Mock.findById(mockId).populate('project')
   }
 
+  /**
+   * 更具productId查询url
+   */
   static find (query, opt) {
     return Mock.find(query, {}, opt).populate('project')
   }

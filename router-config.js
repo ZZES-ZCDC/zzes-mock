@@ -1,8 +1,11 @@
 'use strict'
 
-const config = require('config')
+// https://www.npmjs.com/package/config
+const config = require('config') 
 const Router = require('koa-router')
-const restc = require('restc').koa2()
+
+// 用于可视化展示请求，调试 RESTful 接口
+const restc = require('restc').koa2() 
 const ratelimit = require('koa-ratelimit')
 const {
   user,
@@ -18,6 +21,7 @@ const middleware = require('./middlewares')
 const rateLimitConf = config.get('rateLimit')
 const apiRouter = new Router({ prefix: '/api' })
 const mockRouter = new Router({ prefix: '/mock' })
+ // api速度限制
 const rate = ratelimit({
   db: baseUtil.getRedis(),
   id: ctx => ctx.url,
@@ -31,6 +35,7 @@ const rate = ratelimit({
   }
 })
 
+// mock路由
 exports.mock = mockRouter
   .all('*', middleware.mockFilter, rate, restc, mock.getMockAPI)
 
