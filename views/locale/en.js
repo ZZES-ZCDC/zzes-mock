@@ -196,6 +196,7 @@ export default {
         action: ['Updae', 'Create'],
         autoClose: 'Auto Close',
         control: ['Format', 'Preview', 'Close'],
+        paramsList: 'Params List',
         submit: {
           error: ['Mock data can\'t be null', 'Please check data definiation is correct.'],
           updateSuccess: 'Update Success'
