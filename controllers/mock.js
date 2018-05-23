@@ -60,12 +60,13 @@ module.exports = class MockController {
 
   static async create (ctx) {
     const uid = ctx.state.user.id
+    // checkBody()是使用的koa-validate插件，可以直接校验请求的参数
     const mode = ctx.checkBody('mode').notEmpty().value
     const projectId = ctx.checkBody('project_id').notEmpty().value
     const description = ctx.checkBody('description').notEmpty().value
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const method = ctx.checkBody('method').notEmpty().toLow().in(['get', 'post', 'put', 'delete', 'patch']).value
-
+  
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
       return
@@ -94,7 +95,7 @@ module.exports = class MockController {
       description,
       method,
       url,
-      mode
+      mode,
     })
 
     await redis.del('project:' + projectId)
@@ -207,6 +208,8 @@ module.exports = class MockController {
 
   /**
    * 获取 Mock 接口
+   * TODO: 可以看到请求的body体没有进行什么操作，只是用于代理请求的时候用用
+   * TODO: query 主要用于jsonp获取callback参数，没用于数据校验
    * @param {*} ctx
    */
   static async getMockAPI (ctx) {
@@ -237,6 +240,7 @@ module.exports = class MockController {
       const url = item.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
       return item.method === method && pathToRegexp(url).test(mockURL) 
     })[0]
+    console.log(JSON.parse(api.mode))
     if (!api) ctx.throw(404)
 
     Mock.Handler.function = function (options) {
@@ -249,12 +253,13 @@ module.exports = class MockController {
       return options.template.call(options.context.currentContext, options)
     }
 
-    if (/^http(s)?/.test(api.mode)) { // 代理模式
-      const url = nodeURL.parse(api.mode.replace(/{/g, ':').replace(/}/g, ''), true)
-      const params = util.params(api.url.replace(/{/g, ':').replace(/}/g, ''), mockURL)
+    // 模式判断
+    if (/^http(s)?/.test(api.mode)) { // 代理模式 需要进行http请求
+      const url = nodeURL.parse(api.mode.replace(/{/g, ':').replace(/}/g, ''), true) // 转换url格式
+      const params = util.params(api.url.replace(/{/g, ':').replace(/}/g, ''), mockURL) 
       const pathname = pathToRegexp.compile(url.pathname)(params)
       try {
-        apiData = await axios({
+        apiData = await axios({ // 请求代理的接口
           method: method,
           url: url.protocol + '//' + url.host + pathname,
           params: _.assign({}, url.query, query),
@@ -265,8 +270,8 @@ module.exports = class MockController {
         ctx.body = ctx.util.refail(error.message || '接口请求失败')
         return
       }
-    } else {
-      // 开个虚拟机解析mock模板，生成数据
+    } else { // mock模式
+      // 开虚拟机解析mock模板，生成数据
       const vm = new VM({
         timeout: 1000,
         sandbox: {
@@ -279,7 +284,7 @@ module.exports = class MockController {
       apiData = vm.run('Mock.mock(template())') // 解决正则表达式失效的问题
       
       /* istanbul ignore else */
-      if (apiData._res) { // 自定义响应 Code
+      if (apiData._res) { // 自定义响应 Code, 看来_res是用来放自定义字段的
         let _res = apiData._res
         ctx.status = _res.status || /* istanbul ignore next */ 200
         /* istanbul ignore else */
@@ -303,12 +308,12 @@ module.exports = class MockController {
     }
 
     await redis.lpush('mock.count', api._id)
-    if (jsonpCallback) {
+    if (jsonpCallback) { // jsonp请求返回数据格式
       ctx.type = 'text/javascript'
       ctx.body = `${jsonpCallback}(${JSON.stringify(apiData, null, 2)})`
         .replace(/\u2028/g, '\\u2028')
         .replace(/\u2029/g, '\\u2029') // JSON parse vs eval fix. https://github.com/rack/rack-contrib/pull/37
-    } else {
+    } else { // 正常返回数据格式
       ctx.body = apiData
     }
   }
