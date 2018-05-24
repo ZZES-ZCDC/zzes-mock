@@ -17,7 +17,7 @@ const parameter = new Parameter({
 })
 
 const util = require('../util')
-const ft = require('../models/fields_table')
+const ft = require('../models/fields_table') // 过滤数据
 const { MockProxy, ProjectProxy, UserGroupProxy } = require('../proxy')
 
 const redis = util.getRedis()
@@ -66,7 +66,8 @@ module.exports = class MockController {
     const description = ctx.checkBody('description').notEmpty().value
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const method = ctx.checkBody('method').notEmpty().toLow().in(['get', 'post', 'put', 'delete', 'patch']).value
-  
+    const params = ctx.checkBody('params').notEmpty().value
+
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
       return
@@ -96,6 +97,7 @@ module.exports = class MockController {
       method,
       url,
       mode,
+      params
     })
 
     await redis.del('project:' + projectId)
@@ -129,6 +131,7 @@ module.exports = class MockController {
 
     if (keywords) {
       const keyExp = new RegExp(keywords)
+      // console.log(keyExp)
       where.$or = [{
         url: keyExp
       }, {
@@ -137,12 +140,13 @@ module.exports = class MockController {
         method: keyExp
       }, {
         mode: keyExp
+      },{
+        params: keyExp
       }]
     }
-
     let mocks = await MockProxy.find(where, opt)
+    console.log('mocks',mocks)
     let project = await ProjectProxy.getById(uid, projectId)
-
     /* istanbul ignore else */
     if (project) {
       project.members = project.members.map(o => _.pick(o, ft.user))
@@ -151,9 +155,8 @@ module.exports = class MockController {
       project.user = _.pick(project.user, ft.user)
       project = _.pick(project, ['user'].concat(ft.project))
     }
-
+    // 数据格式化
     mocks = mocks.map(o => _.pick(o, ft.mock))
-
     ctx.body = ctx.util.resuccess({ project: project || {}, mocks })
   }
 
@@ -163,13 +166,15 @@ module.exports = class MockController {
    */
 
   static async update (ctx) {
+    // console.log(ctx.request.body)
     const uid = ctx.state.user.id
     const id = ctx.checkBody('id').notEmpty().value
     const mode = ctx.checkBody('mode').notEmpty().value
     const description = ctx.checkBody('description').notEmpty().value
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const method = ctx.checkBody('method').notEmpty().toLow().in(['get', 'post', 'put', 'delete', 'patch']).value
-
+    const params = ctx.checkBody('params').notEmpty().value
+    // console.log('bodyparams', params)
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
       return
@@ -183,12 +188,12 @@ module.exports = class MockController {
     }
 
     const { api, project } = result
-
     api.url = url
     api.mode = mode
     api.method = method
     api.description = description
-
+    api.params = JSON.stringify(params)
+    // console.log('apiparams',api.params)
     const existMock = await MockProxy.findOne({
       _id: { $ne: api.id },
       project: project.id,
@@ -200,7 +205,7 @@ module.exports = class MockController {
       ctx.body = ctx.util.refail('接口已经存在')
       return
     }
-
+    // console.log(api)
     await MockProxy.updateById(api)
     await redis.del('project:' + project.id)
     ctx.body = ctx.util.resuccess()
@@ -240,7 +245,7 @@ module.exports = class MockController {
       const url = item.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
       return item.method === method && pathToRegexp(url).test(mockURL) 
     })[0]
-    console.log(JSON.parse(api.mode))
+    // console.log(JSON.parse(api.mode))
     if (!api) ctx.throw(404)
 
     Mock.Handler.function = function (options) {
