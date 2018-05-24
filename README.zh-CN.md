@@ -1,23 +1,4 @@
-<p align="center"><a href="https://easy-mock.com" target="_blank"><img width="100"src="http://img.souche.com/20170509/png/fff9d8506199c4bf8cc53bad9d849215.png"></a></p>
 
-<p align="center">
-  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D8.9.1-green.svg?style=flat" alt="Node.js Version"></a>
-  <a href="https://www.mongodb.com"><img src="https://img.shields.io/badge/mongo-%3E%3D3.4.1-green.svg?style=flat" alt="MongoDB Version"></a>
-  <a href="https://redis.io"><img src="https://img.shields.io/badge/redis-%3E%3D4.0-green.svg?style=flat" alt="Redis Version"></a>
-  <a href="https://circleci.com/gh/easy-mock/easy-mock/tree/dev"><img src="https://img.shields.io/circleci/project/easy-mock/easy-mock/dev.svg" alt="Build Status"></a>
-  <a href="https://codecov.io/github/easy-mock/easy-mock?branch=dev"><img src="https://img.shields.io/codecov/c/github/easy-mock/easy-mock/dev.svg" alt="Coverage Status"></a>
-  <a href="http://standardjs.com"><img src="https://img.shields.io/badge/code%20style-standard-brightgreen.svg" alt="js-standard-style"></a>
-  <a href="https://opensource.org/licenses/GPL-3.0"><img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="License"></a>
-  <a href="https://discord.gg/DdhQnaS"><img src="https://img.shields.io/badge/chat-on%20discord-7289da.svg" alt="Chat"></a>
-</p>
-
-<p align="center">
-  <b>特别感谢在线服务的服务器赞助商</b>
-  <br><br>
-  <a href="http://www.souche.com" target="_blank">
-    <img src="http://img.souche.com/f2e/08aa2b695f6298302f767b2439db4537.png" width="200">
-  </a>
-</p>
 
 ## 介绍
 
@@ -171,71 +152,5 @@ $ NODE_ENV=production pm2 start app.js
 
 [Release](https://github.com/easy-mock/easy-mock/releases) 中记录了每个版本的详细更改。
 
-## 贡献
-
-Easy Mock 目前由[大搜车无线架构团队](http://f2e.souche.com/blog/)进行维护。如有问题，欢迎提出 [Issues](https://github.com/easy-mock/easy-mock/issues/new)，并通过 [Pull Request](https://github.com/easy-mock/easy-mock/pulls) 共同维护。不过在此之前，请务必阅读这份[贡献指南](https://github.com/easy-mock/easy-mock/blob/master/.github/CONTRIBUTING.md)。
-
-## 实时反馈
-
-实时问题可以加 QQ 群 595325417 进行反馈，当然也可以扫描下面的二维码加群。
-
-<img src="http://img.souche.com/f2e/4cc362927ef7d1ba46de59097330955a.png" width="260px">
-
-## 在使用的团队或公司
-
-如有内网部署，请务必[告诉我们](https://github.com/easy-mock/easy-mock/issues/47)
-
-* [Souche inc | 大搜车](https://blog.souche.com/)
-* [Ruff](https://ruff.io/zh-cn/)
-* [Qiniu | 七牛](https://qiniu.com/)
-* [Head Spring | 恒达时讯](http://www.hdsxtech.com/)
-* [Digital Union | 数字联盟](https://www.shuzilm.cn/)
-* [CityTogo | 兔狗家装](http://tugou.com/)
-* [Mistong | 铭师堂](http://www.mistong.com/)
-* [Tuotuo Internet | 妥妥网络](https://www.finger66.com/web)
-* [Straight flush | 同花顺](http://www.10jqka.com.cn/)
-* [360 Enterprise Security | 360企业安全集团](http://www.360.net/)
-* [MeiTuan | 美团网](http://www.meituan.com)
-* [Wenba. Inc | 上海谦问万答吧云计算科技有限公司 AI学部门](http://www.ailearn100.com/)
-* [PPMoney | 万惠集团](https://www.ppmoney.com/)
-* [Mysoft Yunke | 明源云客](http://www.myunke.com/)
-* [GeekPark | 极客公园](http://geekpark.net/)
-* [Enation Soft Co., Ltd | 易族智汇（北京）科技有限公司](http://www.javamall.com.cn/)
-* [Harmony Cloud | 杭州谐云科技有限公司](http://harmonycloud.cn/)
-* [China Literature | 阅文集团](http://ir.yuewen.com/cn/)
-* [huodongxing | 活动行](http://www.huodongxing.com)
-* [kinhom | 金海马商业集团](http://www.kinhom.com/)
-* [yuntongxun | 北京容联易通信息技术有限公司](http://www.yuntongxun.com/)
-* [YHD | 1号店](http://www.yhd.com/)
-* [51NB | 51信用卡](https://web.u51.com/u51-pc)
-
-## Core Contributors
-
-<table id="contributors">
-<tr>
-  <td>
-    <a href="https://github.com/chuangker">
-      <img src="https://avatars3.githubusercontent.com/u/7939566?v=4&s=100"><br><span>chuangker</span>
-    </a>
-  </td>
-  <td>
-    <a href="https://github.com/XadillaX">
-      <img src="https://avatars0.githubusercontent.com/u/2842176?v=4&s=100"><br><span>XadillaX</span>
-    </a>
-  </td>
-  <td>
-    <a href="https://github.com/ostoc">
-      <img src="https://avatars2.githubusercontent.com/u/3025708?v=4&s=100"><br><span>ostoc</span>
-    </a>
-  </td>
-  <td>
-    <a href="https://github.com/xinyu198736">
-      <img src="https://avatars3.githubusercontent.com/u/897401?v=4&s=100"><br><span>xinyu198736</span>
-    </a>
-  </td>
-</tr>
-</table>
-
-## License
 
 [GPL-3.0](https://opensource.org/licenses/GPL-3.0)
