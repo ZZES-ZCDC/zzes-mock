@@ -49,7 +49,7 @@
                         <Input type="text" v-model="item.value" placeholder="Enter something..."/>
                       </Col>
                       <Col span="9">
-                        <i-select v-model="item.paramType">
+                        <i-select v-model="item.paramType" >
                           <Option v-for="item in paramTypes" :value="item.type" :key="item.type">{{ item.type }}</Option>
                         </i-select>
                       </Col>
@@ -59,7 +59,7 @@
                     </Row>
                   </div>         
                 </div>
-                <Button type="ghost" @click="push">push</Button>
+                <!-- <Button type="ghost" @click="getParams">push</Button> -->
               </Form-item>
               <!-- 提交按钮 -->
               <Form-item>
@@ -112,18 +112,26 @@ export default {
         { label: 'delete', value: 'delete' },
         { label: 'patch', value: 'patch' }
       ],
+      // 传参form里的数据类型
       paramTypes: [
-        { type: 'String' },
-        { type: 'Number' },
-        { type: 'Boolean' }
+        { type: 'int' },
+        { type: 'string' },
+        { type: 'email' },
+        { type: 'boolean' },
+        { type: 'array' },
+        { type: 'object' },
+        { type: 'date' },
+        { type: 'datetime' }
       ],
       temp: {
         url: '',
         mode: '',
         method: '',
-        description: ''
+        description: '',
+        params: {}
       },
       index: 1,
+      // 传参的form
       formDynamic: {
         items: [{
           value: '',
@@ -163,17 +171,21 @@ export default {
       document.body.style.overflow = show ? 'hidden' : 'auto'
       if (show) {
         if (this.isEdit) {
+          // console.log(this.value)
           this.autoClose = true
           this.temp.url = this.value.url.slice(1) // remove /
           this.temp.mode = this.value.mode
           this.temp.method = this.value.method
           this.temp.description = this.value.description
+          this.temp.params = this.value.params
+          console.log(this.setParams(this.value.params))
           this.codeEditor.setValue(this.temp.mode)
         } else {
           this.temp.url = ''
           this.temp.mode = '{"data": {}}'
           this.temp.method = 'get'
           this.temp.description = ''
+          this.temp.params = ''
           this.codeEditor.setValue(this.temp.mode)
         }
         this.format()
@@ -205,6 +217,7 @@ export default {
       const mockUrl = this.convertUrl(this.temp.url)
 
       try {
+        // 获取编辑器里的mock表达式
         const value = (new Function(`return ${this.temp.mode}`))() // eslint-disable-line
         if (!value) {
           this.$Message.error(this.$t('p.detail.editor.submit.error[0]'))
@@ -218,8 +231,8 @@ export default {
           return
         }
       }
-
-      if (this.isEdit) {
+      if (this.isEdit) { // 更新接口数据
+        this.temp.params = this.getParams()
         api.mock.update({
           data: {
             ...this.temp,
@@ -233,10 +246,13 @@ export default {
             this.value.mode = this.temp.mode
             this.value.method = this.temp.method
             this.value.description = this.temp.description
+            this.value.params = this.temp.params
             if (this.autoClose) this.close()
           }
         })
       } else {
+        this.temp.params = JSON.stringify(this.getParams())
+        // 若不是更新，则创建
         this.$store.dispatch('mock/CREATE', {
           route: this.$route,
           ...this.temp,
@@ -263,14 +279,35 @@ export default {
     handleRemove (index) {
       this.formDynamic.items[index].status = 0
     },
-    push () {
-      let arr = []
+    /**
+     * 格式化参数列表数据
+     */
+    getParams () {
+      let obj = {}
       this.formDynamic.items.map((v, i) => {
         if (v.status === 1) {
-          arr.push(v)
+          obj[v.value] = v.paramType
         }
       })
-      console.log(arr)
+      // console.log(arr)
+      return obj
+    },
+    /**
+     * 将获取到的值放入到参数列表中
+     * @param {String} params
+     */
+    setParams (params) {
+      let data = JSON.parse(params)
+      this.formDynamic.items = []
+      for (let i in data) {
+        this.formDynamic.items.push({
+          value: i,
+          paramType: data[i],
+          index: 1,
+          status: 1
+        })
+      }
+      return this.formDynamic.items
     }
   }
 }

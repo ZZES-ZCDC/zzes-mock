@@ -165,10 +165,11 @@ export default {
             </tag>
           }
         },
-        { title: 'URL', width: 420, ellipsis: true, sortable: true, key: 'url' },
+        { title: 'URL', width: 220, ellipsis: true, sortable: true, key: 'url' },
         { title: this.$t('p.detail.columns[0]'), ellipsis: true, key: 'description' },
+        { title: this.$t('p.detail.columns[1]'), width: 220, ellipsis: false, key: 'params' },
         {
-          title: this.$t('p.detail.columns[1]'),
+          title: this.$t('p.detail.columns[2]'),
           key: 'action',
           width: 160,
           align: 'center',
