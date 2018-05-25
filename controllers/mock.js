@@ -141,7 +141,6 @@ module.exports = class MockController {
       }]
     }
     let mocks = await MockProxy.find(where, opt)
-    // console.log('mocks',mocks)
     let project = await ProjectProxy.getById(uid, projectId)
     /* istanbul ignore else */
     if (project) {
@@ -215,6 +214,7 @@ module.exports = class MockController {
    */
   static async getMockAPI (ctx) {
     const { query, body } = ctx.request // 获取参数
+    console.log(query)
     const method = ctx.method.toLowerCase() // 请求方法小写
     const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback') // jsonp需要
     let { projectId, mockURL } = ctx.pathNode // 取出projectId 和 mockURL

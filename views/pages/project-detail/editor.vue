@@ -38,9 +38,10 @@
               <Form-item :label="$t('p.detail.editor.autoClose')" v-if="isEdit">
                 <i-switch v-model="autoClose"></i-switch>
               </Form-item>
+             
               
-              <!-- 参数列表 -->
-              <Form-item :label="$t('p.detail.editor.paramsList')">
+              <!-- 参数列表 除了get方法外才显示-->
+              <Form-item :label="$t('p.detail.editor.paramsList')" v-if="temp.method!=='get'">
                 <Button style="width:100%" type="ghost" @click="handleAdd">+</Button>
                 <div class="box">
                   <div v-for="(item, index) in formDynamic.items" :key="index" v-if="item.status">
@@ -61,6 +62,7 @@
                 </div>
                 <!-- <Button type="ghost" @click="getParams">push</Button> -->
               </Form-item>
+              
               <!-- 提交按钮 -->
               <Form-item>
                 <Button type="primary" long @click="submit">{{isEdit ? $t('p.detail.editor.action[0]') : $t('p.detail.editor.action[1]')}}</Button>

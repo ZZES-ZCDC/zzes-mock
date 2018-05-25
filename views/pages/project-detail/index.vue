@@ -324,6 +324,7 @@ export default {
       })
     },
     openEditor (mock) {
+      // console.log(mock)
       this.editor = mock || {}
       this.$set(this.editor, 'show', true)
     }
