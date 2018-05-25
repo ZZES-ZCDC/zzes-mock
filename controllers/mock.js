@@ -8,13 +8,9 @@ const Mock = require('mockjs')
 const axios = require('axios')
 const config = require('config')
 const pathToRegexp = require('path-to-regexp')
+// 引入校验插件
 const Parameter = require('parameter')
-const parameter = new Parameter({
-  translate: function() {
-    let args = Array.prototype.slice.call(arguments)
-    return I18n.t.apply(I18n, args)
-  }
-})
+const parameter = new Parameter()
 
 const util = require('../util')
 const ft = require('../models/fields_table') // 过滤数据
@@ -145,7 +141,7 @@ module.exports = class MockController {
       }]
     }
     let mocks = await MockProxy.find(where, opt)
-    console.log('mocks',mocks)
+    // console.log('mocks',mocks)
     let project = await ProjectProxy.getById(uid, projectId)
     /* istanbul ignore else */
     if (project) {
@@ -220,34 +216,43 @@ module.exports = class MockController {
   static async getMockAPI (ctx) {
     const { query, body } = ctx.request // 获取参数
     const method = ctx.method.toLowerCase() // 请求方法小写
-    const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback')
+    const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback') // jsonp需要
     let { projectId, mockURL } = ctx.pathNode // 取出projectId 和 mockURL
-    const redisKey = 'project:' + projectId 
+    const redisKey = 'project:' + projectId // 设置redis key值
     let apiData, apis, api
 
-    // 读取api
-    apis = await redis.get(redisKey)
+    // 获取所有api ===========================================
+    // 读取apis
+    apis = await redis.get(redisKey) // 从redis中读取api
 
-    if (apis) { // 如果存在api，则解析api
+    if (apis) { // 如果redis中存在apis，则解析apis
       apis = JSON.parse(apis)
     } else { // 如果没有去数据库里查找对应的信息
       apis = await MockProxy.find({ project: projectId })
-      // 如果存在，则存入redis
+      // 如果数据库中存在，则存入redis
       if (apis[0]) await redis.set(redisKey, JSON.stringify(apis), 'EX', 60 * 30)
     }
-
+    
     if (apis[0] && apis[0].project.url !== '/') {
       mockURL = mockURL.replace(apis[0].project.url, '') || '/'
     }
-
+    
+    // 过滤出api ==========================================
     api = apis.filter((item) => {
       // 格式转换
       const url = item.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
       return item.method === method && pathToRegexp(url).test(mockURL) 
     })[0]
-    // console.log(JSON.parse(api.mode))
     if (!api) ctx.throw(404)
+    // console.log(api)
 
+    // 传参判断
+    let errors
+    if(api.method === 'post') {
+      let rule = JSON.parse(api.params)
+      errors = parameter.validate(rule, body)  
+    }
+    
     Mock.Handler.function = function (options) {
       // 转换格式
       const mockUrl = api.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
@@ -257,7 +262,7 @@ module.exports = class MockController {
       options._req.cookies = ctx.cookies.get.bind(ctx)
       return options.template.call(options.context.currentContext, options)
     }
-
+    
     // 模式判断
     if (/^http(s)?/.test(api.mode)) { // 代理模式 需要进行http请求
       const url = nodeURL.parse(api.mode.replace(/{/g, ':').replace(/}/g, ''), true) // 转换url格式
@@ -313,13 +318,17 @@ module.exports = class MockController {
     }
 
     await redis.lpush('mock.count', api._id)
-    if (jsonpCallback) { // jsonp请求返回数据格式
-      ctx.type = 'text/javascript'
-      ctx.body = `${jsonpCallback}(${JSON.stringify(apiData, null, 2)})`
-        .replace(/\u2028/g, '\\u2028')
-        .replace(/\u2029/g, '\\u2029') // JSON parse vs eval fix. https://github.com/rack/rack-contrib/pull/37
-    } else { // 正常返回数据格式
-      ctx.body = apiData
+    if(errors) {
+      ctx.body = errors
+    } else {
+      if (jsonpCallback) { // jsonp请求返回数据格式
+        ctx.type = 'text/javascript'
+        ctx.body = `${jsonpCallback}(${JSON.stringify(apiData, null, 2)})`
+          .replace(/\u2028/g, '\\u2028')
+          .replace(/\u2029/g, '\\u2029') // JSON parse vs eval fix. https://github.com/rack/rack-contrib/pull/37
+      } else { // 正常返回数据格式
+        ctx.body = apiData
+      }
     }
   }
 
