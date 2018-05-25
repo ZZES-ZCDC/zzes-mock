@@ -46,15 +46,18 @@
                 <div class="box">
                   <div v-for="(item, index) in formDynamic.items" :key="index" v-if="item.status">
                     <Row>
-                      <Col span="9">
-                        <Input type="text" v-model="item.value" placeholder="Enter something..."/>
+                      <Col span="7">
+                        <Input type="text" v-model="item.value" placeholder="参数名称"/>
                       </Col>
-                      <Col span="9">
-                        <i-select v-model="item.paramType" >
+                      <Col span="7">
+                        <i-select v-model="item.paramType" placeholder="请选择参数类型">
                           <Option v-for="item in paramTypes" :value="item.type" :key="item.type">{{ item.type }}</Option>
                         </i-select>
                       </Col>
-                      <Col span="4" offset="1">
+                      <Col span="7">
+                        <Input type="text" v-model="item.info" placeholder="参数说明"/>
+                      </Col>
+                      <Col span="2" offset="1">
                         <Button type="ghost" @click="handleRemove(index)">-</Button>
                       </Col>
                     </Row>
@@ -138,6 +141,7 @@ export default {
         items: [{
           value: '',
           paramType: '',
+          info: '',
           index: 1,
           status: 1
         }]
@@ -169,6 +173,9 @@ export default {
     })
   },
   watch: {
+    /**
+     * 当点击编辑按钮，弹出编辑层，即会触发数据填充
+     */
     'value.show': function (show) {
       document.body.style.overflow = show ? 'hidden' : 'auto'
       if (show) {
@@ -180,7 +187,8 @@ export default {
           this.temp.method = this.value.method
           this.temp.description = this.value.description
           this.temp.params = this.value.params
-          console.log(this.setParams(this.value.params))
+          // console.log(this.temp.params)
+          this.setParams(this.value.params) // 填充数据列表
           this.codeEditor.setValue(this.temp.mode)
         } else {
           this.temp.url = ''
@@ -288,7 +296,7 @@ export default {
       let obj = {}
       this.formDynamic.items.map((v, i) => {
         if (v.status === 1) {
-          obj[v.value] = v.paramType
+          obj[v.value] = [v.paramType, v.info]
         }
       })
       // console.log(arr)
@@ -300,11 +308,13 @@ export default {
      */
     setParams (params) {
       let data = JSON.parse(params)
+      // console.log(data)
       this.formDynamic.items = []
       for (let i in data) {
         this.formDynamic.items.push({
           value: i,
-          paramType: data[i],
+          paramType: data[i][0],
+          info: data[i][1],
           index: 1,
           status: 1
         })
