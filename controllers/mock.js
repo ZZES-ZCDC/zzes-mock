@@ -214,7 +214,6 @@ module.exports = class MockController {
    */
   static async getMockAPI (ctx) {
     const { query, body } = ctx.request // 获取参数
-    console.log(query)
     const method = ctx.method.toLowerCase() // 请求方法小写
     const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback') // jsonp需要
     let { projectId, mockURL } = ctx.pathNode // 取出projectId 和 mockURL
@@ -249,7 +248,13 @@ module.exports = class MockController {
     // 传参判断
     let errors
     if(api.method === 'post') {
-      let rule = JSON.parse(api.params)
+      let paramData = JSON.parse(api.params)
+      let rule = {}
+      for( let key in paramData) {
+        // console.log(key)
+        rule[key] = paramData[key][0]
+      }
+      console.log(rule)
       errors = parameter.validate(rule, body)  
     }
     
