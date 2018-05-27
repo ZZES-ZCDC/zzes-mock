@@ -247,15 +247,27 @@ module.exports = class MockController {
 
     // 传参判断
     let errors
-    if(api.method === 'post') {
+    // 根据方法来选择参数的格式判断
+    if(api.method !== 'get') { // get之外的方法
       let paramData = JSON.parse(api.params)
       let rule = {}
       for( let key in paramData) {
         // console.log(key)
         rule[key] = paramData[key][0]
       }
-      console.log(rule)
       errors = parameter.validate(rule, body)  
+    } else { // get方法
+      let paramData = JSON.parse(api.params)
+      let rule = {}
+      for ( let key in paramData ) {
+        rule[key] = 'string' // 这地方只能判断string ， query获取到的全都是字符串类型， 所以get参数应该只能判断是否存在，不能判断类型
+      }
+      // 此处巨坑，query没有hasOwnProperty
+      let queryObj = {}
+      for ( let key in query ) {
+        queryObj[key] = query[key]
+      }
+      errors = parameter.validate(rule, queryObj)
     }
     
     Mock.Handler.function = function (options) {

@@ -40,8 +40,8 @@
               </Form-item>
              
               
-              <!-- 参数列表 除了get方法外才显示-->
-              <Form-item :label="$t('p.detail.editor.paramsList')" v-if="temp.method!=='get'">
+              <!-- 参数列表 get方法放在url后？，其余放于body里-->
+              <Form-item :label="$t('p.detail.editor.paramsList')" >
                 <Button style="width:100%" type="ghost" @click="handleAdd">+</Button>
                 <div class="box">
                   <div v-for="(item, index) in formDynamic.items" :key="index" v-if="item.status">
@@ -184,6 +184,7 @@ export default {
           this.autoClose = true
           this.temp.url = this.value.url.slice(1) // remove /
           this.temp.mode = this.value.mode
+          console.log(this.temp.params)
           this.temp.method = this.value.method
           this.temp.description = this.value.description
           this.temp.params = this.value.params
@@ -196,6 +197,7 @@ export default {
           this.temp.method = 'get'
           this.temp.description = ''
           this.temp.params = ''
+          this.setParams(this.value.params)
           this.codeEditor.setValue(this.temp.mode)
         }
         this.format()
@@ -278,6 +280,7 @@ export default {
     preview () {
       window.open(this.$parent.baseUrl + this.value.url + '#!method=' + this.value.method)
     },
+    // 添加参数
     handleAdd () {
       this.index++
       this.formDynamic.items.push({
@@ -286,6 +289,7 @@ export default {
         status: 1
       })
     },
+    // 删除参数
     handleRemove (index) {
       this.formDynamic.items[index].status = 0
     },
@@ -307,19 +311,22 @@ export default {
      * @param {String} params
      */
     setParams (params) {
-      let data = JSON.parse(params)
-      // console.log(data)
-      this.formDynamic.items = []
-      for (let i in data) {
-        this.formDynamic.items.push({
-          value: i,
-          paramType: data[i][0],
-          info: data[i][1],
-          index: 1,
-          status: 1
-        })
+      if (params !== '') {
+        let data = JSON.parse(params)
+        // console.log(data)
+        this.formDynamic.items = []
+        for (let i in data) {
+          this.formDynamic.items.push({
+            value: i,
+            paramType: data[i][0],
+            info: data[i][1],
+            index: 1,
+            status: 1
+          })
+        }
+      } else {
+        this.formDynamic = []
       }
-      return this.formDynamic.items
     }
   }
 }

@@ -1,4 +1,5 @@
 <template>
+  <!-- 表格中单击下拉显示的数据 -->
   <div class="em-mock-expand">
     <h2>Method</h2>
     <p>{{mock.method}}</p>
@@ -6,6 +7,8 @@
     <p>{{mock.url}}</p>
     <h2>{{$t('p.detail.expand.description')}}</h2>
     <p>{{mock.description}}</p>
+    <h2>传参</h2>
+    <p>{{mock.params}}</p>
     <Tabs value="request" v-if="mock.parameters || mock.response_model">
       <Tab-pane :label="$t('p.detail.expand.tab[0]')" name="request" v-if="mock.parameters">
         <Table :columns="columnsRequest" :data="request"></Table>
