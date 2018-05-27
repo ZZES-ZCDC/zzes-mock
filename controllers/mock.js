@@ -260,8 +260,9 @@ module.exports = class MockController {
       let paramData = JSON.parse(api.params)
       let rule = {}
       for ( let key in paramData ) {
-        rule[key] = paramData[key][0]
+        rule[key] = 'string' // 这地方只能判断string ， query获取到的全都是字符串类型， 所以get参数应该只能判断是否存在，不能判断类型
       }
+      // 此处巨坑，query没有hasOwnProperty
       let queryObj = {}
       for ( let key in query ) {
         queryObj[key] = query[key]
