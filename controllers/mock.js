@@ -247,15 +247,26 @@ module.exports = class MockController {
 
     // 传参判断
     let errors
-    if(api.method === 'post') {
+    // 根据方法来选择参数的格式判断
+    if(api.method !== 'get') { // get之外的方法
       let paramData = JSON.parse(api.params)
       let rule = {}
       for( let key in paramData) {
         // console.log(key)
         rule[key] = paramData[key][0]
       }
-      console.log(rule)
       errors = parameter.validate(rule, body)  
+    } else { // get方法
+      let paramData = JSON.parse(api.params)
+      let rule = {}
+      for ( let key in paramData ) {
+        rule[key] = paramData[key][0]
+      }
+      let queryObj = {}
+      for ( let key in query ) {
+        queryObj[key] = query[key]
+      }
+      errors = parameter.validate(rule, queryObj)
     }
     
     Mock.Handler.function = function (options) {
