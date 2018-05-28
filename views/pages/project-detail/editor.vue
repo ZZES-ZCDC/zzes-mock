@@ -30,9 +30,10 @@
                 </Col>  
               </Row>
               <!-- line 2 -->
-              <!-- 请求描述 -->
+              <!-- 请求描述 TODO: 改成textarea -->
               <Form-item :label="$t('p.detail.columns[0]')">
-                <i-input v-model="temp.description"></i-input>
+                <!-- <i-input v-model="temp.description"></i-input> -->
+                <i-input type="textarea" v-model="temp.description" :autosize="{minRows: 5,maxRows: 10}" placeholder="输入请求描述"></i-input>
               </Form-item>  
               <!-- 是否自动关闭 -->
               <Form-item :label="$t('p.detail.editor.autoClose')" v-if="isEdit">
