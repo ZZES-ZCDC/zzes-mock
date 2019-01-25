@@ -131,8 +131,8 @@ export default {
       ],
       temp: {
         url: '',
-        mode: '',
-        method: '',
+        mode: '{"data": {}}',
+        method: 'get',
         description: '',
         params: {}
       },
