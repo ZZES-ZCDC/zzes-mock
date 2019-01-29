@@ -200,6 +200,7 @@ module.exports = class MockController {
 
   /**
    * 获取 Mock 接口
+   * Mock数据返回
    * @param {*} ctx
    */
 
@@ -213,9 +214,9 @@ module.exports = class MockController {
 
     apis = await redis.get(redisKey)
 
-    if (apis) {
+    if (apis) { // 存在直接解析
       apis = JSON.parse(apis)
-    } else {
+    } else { // 不存在, 从数据库读取, 并存入redis
       apis = await MockProxy.find({ project: projectId })
       if (apis[0]) await redis.set(redisKey, JSON.stringify(apis), 'EX', 60 * 30)
     }
@@ -224,18 +225,18 @@ module.exports = class MockController {
       mockURL = mockURL.replace(apis[0].project.url, '') || '/'
     }
 
-    api = apis.filter((item) => {
+    api = apis.filter((item) => { // 判断url是否匹配
       const url = item.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
       return item.method === method && pathToRegexp(url).test(mockURL)
     })[0]
 
-    if (!api) ctx.throw(404)
+    if (!api) ctx.throw(404) // 不匹配 返回404
 
     Mock.Handler.function = function (options) {
       const mockUrl = api.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
       options.Mock = Mock
       options._req = ctx.request
-      options._req.params = util.params(mockUrl, mockURL)
+      options._req.params = util.params(mockUrl, mockURL) // 解析获取参数
       options._req.cookies = ctx.cookies.get.bind(ctx)
       return options.template.call(options.context.currentContext, options)
     }
@@ -257,8 +258,8 @@ module.exports = class MockController {
         ctx.body = ctx.util.refail(error.message || '接口请求失败')
         return
       }
-    } else {
-      const vm = new VM({
+    } else { // 非代理, mock数据
+      const vm = new VM({ // 创建虚拟机
         timeout: 1000,
         sandbox: {
           Mock: Mock,
