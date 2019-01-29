@@ -1,0 +1,81 @@
+@import '../../styles/base/var.css';
+
+@c layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  @d nav {
+    background: #495060;
+    img {
+      vertical-align: middle;
+    }
+
+    .ivu-menu {
+      max-width: var(--body-width);
+      margin: auto;
+    }
+
+    .nav-logo {
+      float: left;
+      margin-left: var(--base-padding);
+      cursor: pointer;
+
+      img {
+        height: 20px;
+      }
+    }
+
+    .nav-search {
+      float: left;
+      width: 150px;
+      margin: 0 var(--base-padding);
+    }
+
+    .nav-avatar {
+      float: right;
+
+      img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+        width: 28px;
+        height: 28px;
+      }
+
+      .ivu-select-dropdown {
+        margin-right: 50px;
+      }
+    }
+
+    .ivu-input-wrapper {
+      vertical-align: inherit;
+    }
+
+    input {
+      background: rgba(255,255,255,0.125);
+    }
+
+    input:focus {
+      background: rgba(255,255,255,0.175);
+    }
+
+    input,
+    input:hover,
+    input:focus {
+      color: #fff;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  @d content {
+    flex: 1;
+  }
+
+  @d copyright {
+    text-align: center;
+    color: #c5c5c5;
+    margin: 16px 0;
+    flex: 0;
+  }
+}
