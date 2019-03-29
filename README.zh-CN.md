@@ -1,16 +1,14 @@
-
-
 ## 介绍
+> 此项目根据 Easy Mock 修改添加相关功能, 运行和部署方式没变, 所以文档直接延用原来
 
-> 如果没有内网部署的条件，推荐使用[在线服务](https://easy-mock.com)。
+## 基于 Easy Mock 添加的功能
 
-Easy Mock 是一个可视化，并且能快速生成**模拟数据**的持久化服务。
-
-<p align="center">
-  <a href="https://easy-mock.com" target="_blank">
-    <img src="http://img.souche.com/f2e/313b36aaa7d0a3af08718c38a2869534.png" width="700px">
-  </a>
-</p>
+ - 传入参数定义
+ - 传参验证
+ - 感谢 [@nostarsnow](https://github.com/nostarsnow) 增加的 
+   - 入参required
+   - 接口列表页的入参列表展示
+   - 预览页根据入参配置, 自动生成参数
 
 ## 特性
 
@@ -50,7 +48,7 @@ $ cd easy-mock && npm install
 
 > 不同环境会加载不同的配置文件，在此之前你应该对 [node-config](https://github.com/lorenwest/node-config) 有所了解。
 
-```js
+```json
 {
   "port": 7300,
   "host": "0.0.0.0",
@@ -148,9 +146,13 @@ $ [sudo] npm install pm2 -g
 $ NODE_ENV=production pm2 start app.js
 ```
 
-## 版本发布
+## [@nostarsnow](https://github.com/nostarsnow) 增加功能截图
 
-[Release](https://github.com/easy-mock/easy-mock/releases) 中记录了每个版本的详细更改。
+### 1. 入参required
+![编辑页](https://wx4.sinaimg.cn/mw690/4d227521ly1g1jiga6urxj20kp0jbjrn.jpg)
 
+### 2. 接口列表页的入参列表展示
+![列表页](https://wx3.sinaimg.cn/mw690/4d227521ly1g1jigccn5xj20pb0gwq3d.jpg)
 
-[GPL-3.0](https://opensource.org/licenses/GPL-3.0)
+### 3. 预览页根据入参配置, 自动生成参数
+![预览页](http://wx3.sinaimg.cn/mw690/4d227521ly1g1jige7t7aj20m80jqt8u.jpg)
