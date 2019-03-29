@@ -71,6 +71,7 @@
                     v-if="i < 5"
                     :key="i">
                 </div>
+                <!-- 操作按钮 -->
                 <Button-group class="project-control">
                   <Button type="ghost" icon="link" :title="$t('p.project.control[0]')" class="copy-url" @click="clip(item)"></Button>
                   <Button type="ghost" icon="ios-copy" :title="$t('p.project.control[1]')" style="width: 34%;" @click.stop="clone(item)"></Button>

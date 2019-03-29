@@ -208,12 +208,12 @@ module.exports = class MockController {
 
   /**
    * 获取 Mock 接口
-   * TODO: 可以看到请求的body体没有进行什么操作，只是用于代理请求的时候用用
-   * TODO: query 主要用于jsonp获取callback参数，没用于数据校验
+   * NOTE: 可以看到请求的body体没有进行什么操作，只是用于代理请求的时候用用
+   * NOTE: query 主要用于jsonp获取callback参数，现将其用于get参数验证
    * @param {*} ctx
    */
   static async getMockAPI (ctx) {
-    const { query, body } = ctx.request // 获取参数
+    const { query, body } = ctx.request // 获取参数
     const method = ctx.method.toLowerCase() // 请求方法小写
     const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback') // jsonp需要
     let { projectId, mockURL } = ctx.pathNode // 取出projectId 和 mockURL
@@ -262,7 +262,7 @@ module.exports = class MockController {
       for ( let key in paramData ) {
         rule[key] = 'string' // 这地方只能判断string ， query获取到的全都是字符串类型， 所以get参数应该只能判断是否存在，不能判断类型
       }
-      // 此处巨坑，query没有hasOwnProperty
+      // NOTE: 此处巨坑，query没有hasOwnProperty
       let queryObj = {}
       for ( let key in query ) {
         queryObj[key] = query[key]

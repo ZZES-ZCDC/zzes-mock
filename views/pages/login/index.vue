@@ -188,6 +188,7 @@ export default {
     return store.dispatch('wallpaper/FETCH')
   },
   mounted () {
+    // 获取随机背景图
     const img = new Image()
     img.src = this.$store.state.wallpaper.url
     img.onload = () => {

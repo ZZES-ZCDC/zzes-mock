@@ -77,7 +77,7 @@ module.exports = class Middleware {
    * @param {Object} next 
    */
   static mockFilter (ctx, next) {
-    // 获取url中的projectId和mockurl
+    // 获取url中的projectId和mockurl
     const pathNode = pathToRegexp('/mock/:projectId(.{24})/:mockURL*').exec(ctx.path)
 
     if (!pathNode) ctx.throw(404)
