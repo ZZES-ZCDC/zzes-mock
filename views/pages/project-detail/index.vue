@@ -252,7 +252,28 @@ export default {
       })
     },
     preview (mock) {
-      window.open(this.baseUrl + mock.url + '#!method=' + mock.method)
+      let after = ''
+      let params = JSON.parse(mock.params || '{}')
+      if (mock.method === 'get') {
+        after = `&queryParameters=${
+          JSON.stringify(Object.keys(params).map(v => {
+            return {
+              enable: true,
+              key: v,
+              value: v.toUpperCase()
+            }
+          }))
+        }`
+      }
+      if (mock.method === 'post') {
+        after = `&body=${
+          JSON.stringify(Object.keys(params).reduce((p, v, i) => {
+            p[v] = v.toUpperCase()
+            return p
+          }, {}))
+        }`
+      }
+      window.open(this.baseUrl + mock.url + '#!method=' + mock.method + after)
     },
     selectionChange (selection) {
       this.selection = selection

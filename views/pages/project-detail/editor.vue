@@ -43,23 +43,29 @@
               
               <!-- 参数列表 get方法放在url后？，其余放于body里-->
               <Form-item :label="$t('p.detail.editor.paramsList')" >
-                <Button style="width:100%" type="ghost" @click="handleAdd">+</Button>
+                <Button style="width:100%" type="ghost" @click="handleAdd"><Icon type="plus-circled" size="22"></Icon></Button>
                 <div class="box">
                   <div v-for="(item, index) in formDynamic.items" :key="index" v-if="item.status">
-                    <Row>
-                      <Col span="7">
+                    <Row :gutter="3">
+                      <Col span="5">
                         <Input type="text" v-model="item.value" placeholder="参数名称"/>
                       </Col>
-                      <Col span="7">
+                      <Col span="5">
                         <i-select v-model="item.paramType" placeholder="请选择参数类型">
                           <Option v-for="item in paramTypes" :value="item.type" :key="item.type">{{ item.type }}</Option>
                         </i-select>
                       </Col>
-                      <Col span="7">
+                      <Col span="9" >
                         <Input type="text" v-model="item.info" placeholder="参数说明"/>
                       </Col>
-                      <Col span="2" offset="1">
-                        <Button type="ghost" @click="handleRemove(index)">-</Button>
+                      <Col span="3" center>
+                        <i-switch v-model="item.required">
+                          <span slot="open">必</span>
+                          <span slot="close">非</span>
+                        </i-switch>
+                      </Col>
+                      <Col span="2">
+                        <Button type="ghost" @click="handleRemove(index)"><Icon type="android-remove-circle" size="22"></Icon></Button>
                       </Col>
                     </Row>
                   </div>         
@@ -78,7 +84,7 @@
               <ul>
                 <!-- 格式化 预览 关闭 三个按钮 -->
                 <li @click="format">{{$t('p.detail.editor.control[0]')}}</li> 
-                <li @click="preview" v-if="isEdit">{{$t('p.detail.editor.control[1]')}}</li>
+                <li @click="preview" v-if="false && isEdit">{{$t('p.detail.editor.control[1]')}}</li>
                 <li @click="close">{{$t('p.detail.editor.control[2]')}}</li>
               </ul>
             </div>
@@ -143,6 +149,7 @@ export default {
           value: '',
           paramType: '',
           info: '',
+          required: false,
           index: 1,
           status: 1
         }]
@@ -259,7 +266,7 @@ export default {
             this.value.mode = this.temp.mode
             this.value.method = this.temp.method
             this.value.description = this.temp.description
-            this.value.params = this.temp.params
+            this.value.params = JSON.stringify(this.temp.params)
             if (this.autoClose) this.close()
           }
         })
@@ -287,6 +294,8 @@ export default {
       this.formDynamic.items.push({
         value: '',
         index: this.index,
+        paramType: 'string',
+        required: false,
         status: 1
       })
     },
@@ -301,7 +310,11 @@ export default {
       let obj = {}
       this.formDynamic.items.map((v, i) => {
         if (v.status === 1) {
-          obj[v.value] = [v.paramType, v.info]
+          obj[v.value] = {
+            type: v.paramType,
+            required: v.required || false,
+            info: v.info
+          }
         }
       })
       // console.log(arr)
@@ -312,21 +325,22 @@ export default {
      * @param {String} params
      */
     setParams (params) {
-      if (params !== '') {
+      if (params !== '' && params !== undefined) {
         let data = JSON.parse(params)
         // console.log(data)
         this.formDynamic.items = []
         for (let i in data) {
           this.formDynamic.items.push({
             value: i,
-            paramType: data[i][0],
-            info: data[i][1],
+            paramType: data[i].type || 'string',
+            info: data[i].info,
             index: 1,
+            required: data[i].required || false,
             status: 1
           })
         }
       } else {
-        this.formDynamic = []
+        this.formDynamic.items = []
       }
     }
   }
