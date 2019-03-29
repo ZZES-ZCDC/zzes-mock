@@ -1,7 +1,9 @@
 'use strict'
 
 const _ = require('lodash')
-const { VM } = require('vm2')
+const {
+  VM
+} = require('vm2')
 const nodeURL = require('url')
 const JSZip = require('jszip')
 const Mock = require('mockjs')
@@ -14,12 +16,16 @@ const parameter = new Parameter()
 
 const util = require('../util')
 const ft = require('../models/fields_table') // 过滤数据
-const { MockProxy, ProjectProxy, UserGroupProxy } = require('../proxy')
+const {
+  MockProxy,
+  ProjectProxy,
+  UserGroupProxy
+} = require('../proxy')
 
 const redis = util.getRedis()
 const defPageSize = config.get('pageSize')
 
-async function checkByMockId (mockId, uid) {
+async function checkByMockId(mockId, uid) {
   const api = await MockProxy.getById(mockId)
 
   if (!api) return '接口不存在'
@@ -27,16 +33,24 @@ async function checkByMockId (mockId, uid) {
   const project = await checkByProjectId(api.project.id, uid)
 
   if (typeof project === 'string') return project
-  return { api, project }
+  return {
+    api,
+    project
+  }
 }
 
-async function checkByProjectId (projectId, uid) {
-  const project = await ProjectProxy.findOne({ _id: projectId })
+async function checkByProjectId(projectId, uid) {
+  const project = await ProjectProxy.findOne({
+    _id: projectId
+  })
 
   if (project) {
     const group = project.group
     if (group) {
-      const userGroup = await UserGroupProxy.findOne({ user: uid, group: group })
+      const userGroup = await UserGroupProxy.findOne({
+        user: uid,
+        group: group
+      })
       if (!userGroup) return '无权限操作'
     } else if (project.user.id !== uid) {
       /* istanbul ignore else */
@@ -54,7 +68,7 @@ module.exports = class MockController {
    * @param Object ctx
    */
 
-  static async create (ctx) {
+  static async create(ctx) {
     const uid = ctx.state.user.id
     // checkBody()是使用的koa-validate插件，可以直接校验请求的参数
     const mode = ctx.checkBody('mode').notEmpty().value
@@ -105,7 +119,7 @@ module.exports = class MockController {
    * @param Object ctx
    */
 
-  static async list (ctx) {
+  static async list(ctx) {
     const uid = ctx.state.user.id
     const keywords = ctx.query.keywords
     const projectId = ctx.checkQuery('project_id').notEmpty().value
@@ -123,7 +137,9 @@ module.exports = class MockController {
       sort: '-create_at'
     }
 
-    const where = { project: projectId }
+    const where = {
+      project: projectId
+    }
 
     if (keywords) {
       const keyExp = new RegExp(keywords)
@@ -136,7 +152,7 @@ module.exports = class MockController {
         method: keyExp
       }, {
         mode: keyExp
-      },{
+      }, {
         params: keyExp
       }]
     }
@@ -152,7 +168,10 @@ module.exports = class MockController {
     }
     // 数据格式化
     mocks = mocks.map(o => _.pick(o, ft.mock))
-    ctx.body = ctx.util.resuccess({ project: project || {}, mocks })
+    ctx.body = ctx.util.resuccess({
+      project: project || {},
+      mocks
+    })
   }
 
   /**
@@ -160,7 +179,7 @@ module.exports = class MockController {
    * @param Object ctx
    */
 
-  static async update (ctx) {
+  static async update(ctx) {
     // console.log(ctx.request.body)
     const uid = ctx.state.user.id
     const id = ctx.checkBody('id').notEmpty().value
@@ -182,7 +201,10 @@ module.exports = class MockController {
       return
     }
 
-    const { api, project } = result
+    const {
+      api,
+      project
+    } = result
     api.url = url
     api.mode = mode
     api.method = method
@@ -190,7 +212,9 @@ module.exports = class MockController {
     api.params = JSON.stringify(params)
     // console.log('apiparams',api.params)
     const existMock = await MockProxy.findOne({
-      _id: { $ne: api.id },
+      _id: {
+        $ne: api.id
+      },
       project: project.id,
       url: api.url,
       method: api.method
@@ -208,15 +232,21 @@ module.exports = class MockController {
 
   /**
    * 获取 Mock 接口
-   * NOTE: 可以看到请求的body体没有进行什么操作，只是用于代理请求的时候用用
-   * NOTE: query 主要用于jsonp获取callback参数，现将其用于get参数验证
+   * TODO: 可以看到请求的body体没有进行什么操作，只是用于代理请求的时候用用
+   * TODO: query 主要用于jsonp获取callback参数，没用于数据校验
    * @param {*} ctx
    */
-  static async getMockAPI (ctx) {
-    const { query, body } = ctx.request // 获取参数
+  static async getMockAPI(ctx) {
+    const {
+      query,
+      body
+    } = ctx.request // 获取参数
     const method = ctx.method.toLowerCase() // 请求方法小写
     const jsonpCallback = query.jsonp_param_name && (query[query.jsonp_param_name] || 'callback') // jsonp需要
-    let { projectId, mockURL } = ctx.pathNode // 取出projectId 和 mockURL
+    let {
+      projectId,
+      mockURL
+    } = ctx.pathNode // 取出projectId 和 mockURL
     const redisKey = 'project:' + projectId // 设置redis key值
     let apiData, apis, api
 
@@ -227,20 +257,22 @@ module.exports = class MockController {
     if (apis) { // 如果redis中存在apis，则解析apis
       apis = JSON.parse(apis)
     } else { // 如果没有去数据库里查找对应的信息
-      apis = await MockProxy.find({ project: projectId })
+      apis = await MockProxy.find({
+        project: projectId
+      })
       // 如果数据库中存在，则存入redis
       if (apis[0]) await redis.set(redisKey, JSON.stringify(apis), 'EX', 60 * 30)
     }
-    
+
     if (apis[0] && apis[0].project.url !== '/') {
       mockURL = mockURL.replace(apis[0].project.url, '') || '/'
     }
-    
+
     // 过滤出api ==========================================
     api = apis.filter((item) => {
       // 格式转换
       const url = item.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
-      return item.method === method && pathToRegexp(url).test(mockURL) 
+      return item.method === method && pathToRegexp(url).test(mockURL)
     })[0]
     if (!api) ctx.throw(404)
     // console.log(api)
@@ -248,28 +280,34 @@ module.exports = class MockController {
     // 传参判断
     let errors
     // 根据方法来选择参数的格式判断
-    if(api.method !== 'get') { // get之外的方法
-      let paramData = JSON.parse(api.params)
+    if (api.method !== 'get') { // get之外的方法
+      let paramData = JSON.parse(api.params || '{}')
       let rule = {}
-      for( let key in paramData) {
+      for (let key in paramData) {
         // console.log(key)
-        rule[key] = paramData[key][0]
+        rule[key] = {
+          type: paramData[key].type,
+          required: paramData[key].required || false
+        }
       }
-      errors = parameter.validate(rule, body)  
+      errors = parameter.validate(rule, body)
     } else { // get方法
-      let paramData = JSON.parse(api.params)
+      let paramData = JSON.parse(api.params || '{}')
       let rule = {}
-      for ( let key in paramData ) {
-        rule[key] = 'string' // 这地方只能判断string ， query获取到的全都是字符串类型， 所以get参数应该只能判断是否存在，不能判断类型
+      for (let key in paramData) {
+        rule[key] = {
+          type: 'string',
+          required: paramData[key].required || false
+        } // 这地方只能判断string ， query获取到的全都是字符串类型， 所以get参数应该只能判断是否存在，不能判断类型
       }
-      // NOTE: 此处巨坑，query没有hasOwnProperty
+      // 此处巨坑，query没有hasOwnProperty
       let queryObj = {}
-      for ( let key in query ) {
+      for (let key in query) {
         queryObj[key] = query[key]
       }
       errors = parameter.validate(rule, queryObj)
     }
-    
+
     Mock.Handler.function = function (options) {
       // 转换格式
       const mockUrl = api.url.replace(/{/g, ':').replace(/}/g, '') // /api/{user}/{id} => /api/:user/:id
@@ -279,11 +317,11 @@ module.exports = class MockController {
       options._req.cookies = ctx.cookies.get.bind(ctx)
       return options.template.call(options.context.currentContext, options)
     }
-    
+
     // 模式判断
     if (/^http(s)?/.test(api.mode)) { // 代理模式 需要进行http请求
       const url = nodeURL.parse(api.mode.replace(/{/g, ':').replace(/}/g, ''), true) // 转换url格式
-      const params = util.params(api.url.replace(/{/g, ':').replace(/}/g, ''), mockURL) 
+      const params = util.params(api.url.replace(/{/g, ':').replace(/}/g, ''), mockURL)
       const pathname = pathToRegexp.compile(url.pathname)(params)
       try {
         apiData = await axios({ // 请求代理的接口
@@ -309,7 +347,7 @@ module.exports = class MockController {
       })
       vm.run('Mock.mock(new Function("return " + mode)())') // 数据验证，检测 setTimeout 等方法
       apiData = vm.run('Mock.mock(template())') // 解决正则表达式失效的问题
-      
+
       /* istanbul ignore else */
       if (apiData._res) { // 自定义响应 Code, 看来_res是用来放自定义字段的
         let _res = apiData._res
@@ -335,7 +373,7 @@ module.exports = class MockController {
     }
 
     await redis.lpush('mock.count', api._id)
-    if(errors) {
+    if (errors) {
       ctx.body = errors
     } else {
       if (jsonpCallback) { // jsonp请求返回数据格式
@@ -354,7 +392,7 @@ module.exports = class MockController {
    * @param Object ctx
    */
 
-  static async getAPIByProjectIds (ctx) {
+  static async getAPIByProjectIds(ctx) {
     let projectIds = ctx.checkQuery('project_ids').notEmpty().value
 
     if (ctx.errors) {
@@ -398,7 +436,7 @@ module.exports = class MockController {
    * @param Object ctx
    */
 
-  static async exportAPI (ctx) {
+  static async exportAPI(ctx) {
     const zip = new JSZip()
     const ids = ctx.checkBody('ids').empty().type('array').value
     const projectId = ctx.checkBody('project_id').empty().value
@@ -410,7 +448,9 @@ module.exports = class MockController {
     }
 
     if (projectId) {
-      apis = await MockProxy.find({ project: projectId })
+      apis = await MockProxy.find({
+        project: projectId
+      })
     } else if (!_.isEmpty(ids)) {
       apis = await MockProxy.find({
         _id: {
@@ -431,7 +471,9 @@ module.exports = class MockController {
       zip.file(`${api.project.url}${api.url}.json`, api.mode)
     })
 
-    const content = await zip.generateAsync({ type: 'nodebuffer' })
+    const content = await zip.generateAsync({
+      type: 'nodebuffer'
+    })
 
     ctx.set('Content-disposition', 'attachment; filename=Easy-Mock-API.zip')
     ctx.body = content
@@ -442,7 +484,7 @@ module.exports = class MockController {
    * @param Object ctx
    */
 
-  static async delete (ctx) {
+  static async delete(ctx) {
     const uid = ctx.state.user.id
     const projectId = ctx.checkBody('project_id').notEmpty().value
     const ids = ctx.checkBody('ids').notEmpty().type('array').value
