@@ -7,8 +7,10 @@
     <p>{{mock.url}}</p>
     <h2>{{$t('p.detail.expand.description')}}</h2>
     <p>{{mock.description}}</p>
-    <h2>传参</h2>
-    <p>{{mock.params}}</p>
+    <div v-if="params.data.length > 0">
+      <h2>传参</h2>
+      <Table border :columns="params.columns" :data="params.data"></Table>
+    </div>
     <Tabs value="request" v-if="mock.parameters || mock.response_model">
       <Tab-pane :label="$t('p.detail.expand.tab[0]')" name="request" v-if="mock.parameters">
         <Table :columns="columnsRequest" :data="request"></Table>
@@ -109,10 +111,44 @@ export default {
         js: getJavaScriptEntities(response).map(o => jsBeautify.js_beautify(o, { indent_size: 2 })),
         oc: getObjectiveCEntities(response)
       }
+    },
+    params () {
+      if (!this.mock.params) {
+        return {
+          data: []
+        }
+      }
+      let params = JSON.parse(this.mock.params)
+      let data = Object.keys(params).map(v => {
+        params[v].name = v
+        return params[v]
+      })
+      return {
+        columns: [
+          {
+            title: '参数名',
+            key: 'name'
+          },
+          {
+            title: '类型',
+            key: 'type'
+          },
+          {
+            title: '描述',
+            key: 'info'
+          },
+          {
+            title: '是否必传',
+            key: 'required'
+          }
+        ],
+        data
+      }
     }
   },
   methods: {
     getParamDataType (parameter) {
+      console.log(parameter)
       const { type, schema } = parameter
       if (type) return type
       if (schema && schema.type) {
