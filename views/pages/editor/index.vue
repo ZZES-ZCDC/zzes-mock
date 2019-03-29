@@ -124,7 +124,7 @@ export default {
         this.submit()
       }
     })
-    // 判断是否是编辑 是则填充数据
+
     if (this.isEdit) {
       this.autoClose = true
       this.temp.url = this.mockData.url.slice(1) // remove /
