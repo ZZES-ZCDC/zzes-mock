@@ -16,6 +16,7 @@ const schema = new Schema({
   parameters: String,
   response_model: String,
   params: String,
+  tag: String,
   create_at: {
     type: Date,
     default: Date.now
