@@ -231,6 +231,11 @@ export default {
     },
     login () {
       const cookies = new Cookies()
+      // 判断是否是邮箱
+      if (!/^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/.test(this.userName)) {
+        this.$Message.error(this.$t('p.login.notEmail'))
+        return
+      }
       api.u.login({
         messageUnless: ['用户不存在'],
         data: {

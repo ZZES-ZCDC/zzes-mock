@@ -19,7 +19,7 @@ module.exports = class UserController {
    */
 
   static async register (ctx) {
-    const name = ctx.checkBody('name').notEmpty().len(4, 20).value
+    const name = ctx.checkBody('name').notEmpty().isEmail().value
     const password = ctx.checkBody('password').notEmpty().len(6, 20).value
 
     if (ctx.errors) {
