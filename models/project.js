@@ -29,6 +29,10 @@ const schema = new Schema({
     ref: 'User',
     default: []
   }],
+  tags: {
+    type: Array,
+    default: []
+  },
   create_at: {
     type: Date,
     default: Date.now

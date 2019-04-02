@@ -14,7 +14,9 @@
       <em-add icon="arrow-up-c" :bottom="90"></em-add>
     </Back-top>
     <transition name="fade" mode="out-in">
+      <!-- 设置 -->
       <project v-if="pageName === $t('p.detail.nav[1]')" key="a" :project-data="project"></project>
+      <!-- 列表 -->
       <div
         class="em-container"
         v-if="pageAnimated && pageName === $t('p.detail.nav[0]')"
@@ -41,6 +43,7 @@
             </Col>
           </Row>
         </div>
+        <!-- 中间一排按钮 -->
         <div class="em-proj-detail__switcher">
           <ul>
             <li @click="openEditor()" v-shortkey="['ctrl', 'n']" @shortkey="openEditor()">
@@ -59,6 +62,7 @@
             <li @click="download"><Icon type="code-download"></Icon> {{$tc('p.detail.download', 1)}}</li>
           </ul>
         </div>
+        <!-- 项目成员 -->
         <div class="em-proj-detail__members" v-if="project.members.length">
           <em-spots :size="6"></em-spots>
           <h2><Icon type="person-stalker"></Icon> {{$t('p.detail.member')}}</h2>
@@ -68,6 +72,7 @@
             </Col>
           </Row>
         </div>
+        <!-- 接口列表 -->
         <Table
           border
           :columns="columns"

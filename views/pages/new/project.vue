@@ -43,6 +43,16 @@
             <i-input v-model="form.projectDesc"
               :placeholder="$tc('p.new.form.description', 2)"></i-input>
           </Form-item>
+          <Form-item :label="$tc('p.new.form.tag', 1)">
+            <template slot="label">
+              {{$tc('p.new.form.tag', 1)}}
+              <Tooltip :content="$tc('p.new.form.tag', 2)">
+                <Icon type="help-circled"></Icon>
+              </Tooltip>
+            </template>
+            <Tag v-for="item in form.projectTags" :key="item" :name="item" closable @on-close="closeTag">{{ item }}</Tag>
+            <Button icon="ios-add" type="dashed" size="small" @click="addTag">添加标签</Button>
+          </Form-item>
           <Form-item :label="$tc('p.new.form.swagger', 0)">
             <template slot="label">
               {{$tc('p.new.form.swagger', 0)}}
@@ -135,7 +145,8 @@ export default {
         projectUrl: '',
         projectDesc: '',
         projectSwagger: '',
-        projectMembers: []
+        projectMembers: [],
+        projectTags: []
       }
     }
   },
@@ -233,6 +244,32 @@ export default {
         return this.groups
       })
     },
+    addTag () {
+      this.$Modal.confirm({
+        render: (h) => {
+          return h('Input', {
+            props: {
+              value: this.tagText,
+              autofocus: true
+            },
+            on: {
+              input: (val) => {
+                this.tagText = val
+              }
+            }
+          })
+        },
+        onOk: () => {
+          if (this.form.projectTags.indexOf(this.tagText) === -1) {
+            this.form.projectTags.push(this.tagText)
+          }
+        }
+      })
+    },
+    closeTag (event, name) {
+      const index = this.form.projectTags.indexOf(name)
+      this.form.projectTags.splice(index, 1)
+    },
     submit () {
       const data = {
         id: this.form.projectId,
@@ -241,7 +278,8 @@ export default {
         swagger_url: this.form.projectSwagger,
         description: this.form.projectDesc,
         url: this.convertUrl(this.projectUrl),
-        members: this.isGroup ? [] : this.form.projectMembers
+        members: this.isGroup ? [] : this.form.projectMembers,
+        tags: this.form.projectTags
       }
 
       if (this.isEdit) {

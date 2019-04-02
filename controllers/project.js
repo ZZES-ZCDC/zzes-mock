@@ -41,6 +41,7 @@ module.exports = class ProjectController {
     const uid = ctx.state.user.id
     const group = ctx.request.body.group
     const description = ctx.request.body.description
+    const tags = ctx.request.body.tags
     const name = ctx.checkBody('name').notEmpty().value
     const memberIds = ctx.checkBody('members').empty().type('array').value
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
@@ -291,6 +292,7 @@ module.exports = class ProjectController {
     const memberIds = ctx.checkBody('members').empty().type('array').value
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const swaggerUrl = ctx.checkBody('swagger_url').empty().isUrl(null, { allow_underscores: true, require_protocol: true }).value
+    const tags = ctx.checkBody('tags').value
 
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
@@ -332,6 +334,7 @@ module.exports = class ProjectController {
     project.members = memberIds || []
     project.swagger_url = swaggerUrl
     project.description = description
+    project.tags = tags
 
     const existQuery = {
       _id: { $ne: project.id },
@@ -356,7 +359,7 @@ module.exports = class ProjectController {
         : ctx.util.refail('请检查 URL 是否已经存在')
       return
     }
-
+    console.log(project)
     await ProjectProxy.updateById(project)
     await redis.del('project:' + id)
     ctx.body = ctx.util.resuccess()
