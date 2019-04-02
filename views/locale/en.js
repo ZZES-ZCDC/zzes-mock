@@ -130,7 +130,8 @@ export default {
         passwordCheck: 'Confirm password',
         update: 'Update Profile',
         avatar: 'Profile Picture',
-        upload: 'Upload New Picture'
+        upload: 'Upload New Picture',
+        email: 'Email'
       },
       formatError: 'Unsupported picture formate | {name} is not support, please upload *.jpg or *.png picture.',
       updateSuccess: 'Update Success | Please login again to check changes.',

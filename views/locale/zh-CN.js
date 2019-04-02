@@ -130,7 +130,8 @@ export default {
         passwordCheck: '确认密码',
         update: '更新资料',
         avatar: '头像',
-        upload: '上传新图片'
+        upload: '上传新图片',
+        email: '邮箱'
       },
       formatError: '文件格式不正确 | 文件 {name} 格式不正确，请上传 jpg 或 png 格式的图片。',
       updateSuccess: '更新成功 | 请重新登录，以完成数据同步。',
