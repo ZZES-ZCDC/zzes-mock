@@ -8,6 +8,7 @@ const schema = new Schema({
   head_img: String,
   name: String,
   password: String,
+  email: String,
   create_at: {
     type: Date,
     default: Date.now
