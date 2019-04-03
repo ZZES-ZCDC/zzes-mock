@@ -201,6 +201,7 @@ export default {
         autoClose: '自动关闭',
         paramsList: '参数列表',
         control: ['格式化', '预览', '关闭'],
+        tag: '选择标签',
         submit: {
           error: ['接口数据不能为空。', '请检查数据定义是否符合要求。'],
           updateSuccess: '更新成功'

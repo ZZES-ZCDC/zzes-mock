@@ -16,7 +16,10 @@ const schema = new Schema({
   parameters: String,
   response_model: String,
   params: String,
-  tag: String,
+  tag: {
+    type: String,
+    default: '默认'
+  },
   create_at: {
     type: Date,
     default: Date.now

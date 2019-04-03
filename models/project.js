@@ -31,7 +31,7 @@ const schema = new Schema({
   }],
   tags: {
     type: Array,
-    default: []
+    default: ['默认']
   },
   template: {
     type: Object,

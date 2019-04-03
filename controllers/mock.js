@@ -195,6 +195,7 @@ module.exports = class MockController {
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const method = ctx.checkBody('method').notEmpty().toLow().in(['get', 'post', 'put', 'delete', 'patch']).value
     const params = ctx.checkBody('params').notEmpty().value
+    const tag = ctx.checkBody('tag').value
     // console.log('bodyparams', params)
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
@@ -217,6 +218,7 @@ module.exports = class MockController {
     api.method = method
     api.description = description
     api.params = JSON.stringify(params)
+    api.tag = tag
     // console.log('apiparams',api.params)
     const existMock = await MockProxy.findOne({
       _id: {
