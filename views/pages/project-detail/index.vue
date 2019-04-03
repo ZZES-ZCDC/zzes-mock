@@ -172,7 +172,15 @@ export default {
         },
         { title: 'URL', width: 220, ellipsis: true, sortable: true, key: 'url' },
         { title: this.$t('p.detail.columns[0]'), ellipsis: true, key: 'description' },
-        // { title: this.$t('p.detail.columns[1]'), width: 220, ellipsis: false, key: 'params' },
+        {
+          title: this.$t('p.detail.columns[1]'),
+          width: 100,
+          ellipsis: false,
+          key: 'tag',
+          render: (h, params) => {
+            return <tag color="green">{params.row.tag}</tag>
+          }
+        },
         {
           title: this.$t('p.detail.columns[2]'),
           key: 'action',
