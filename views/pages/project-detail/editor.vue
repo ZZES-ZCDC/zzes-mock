@@ -152,6 +152,7 @@ export default {
         params: {},
         tag: ''
       },
+      tags: [],
       index: 1,
       // 传参的form
       formDynamic: {
@@ -169,13 +170,6 @@ export default {
   computed: {
     isEdit () {
       return !!this.value._id
-    },
-    tags () {
-      const id = this.$route.params.id
-      const project = this.$store.state.project.list.filter(v => {
-        return v._id === id
-      })
-      return project[0].tags
     }
   },
   mounted () {
@@ -204,6 +198,11 @@ export default {
     'value.show': function (show) {
       document.body.style.overflow = show ? 'hidden' : 'auto'
       if (show) {
+        const id = this.$route.params.id
+        const project = this.$store.state.project.list.filter(v => {
+          return v._id === id
+        })
+        this.tags = project[0].tags
         if (this.isEdit) {
           // console.log(this.value)
           this.autoClose = true
