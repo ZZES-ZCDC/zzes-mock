@@ -66,7 +66,8 @@ module.exports = class ProjectProxy {
         members: project.members,
         description: project.description,
         swagger_url: project.swagger_url,
-        tags: project.tags
+        tags: project.tags,
+        template: project.template
       }
     })
   }

@@ -33,6 +33,10 @@ const schema = new Schema({
     type: Array,
     default: []
   },
+  template: {
+    type: Object,
+    default: {}
+  },
   create_at: {
     type: Date,
     default: Date.now
