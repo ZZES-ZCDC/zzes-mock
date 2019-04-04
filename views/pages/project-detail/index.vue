@@ -46,6 +46,7 @@
         <!-- 中间一排按钮 -->
         <div class="em-proj-detail__switcher">
           <ul>
+            <!-- 创建接口 -->
             <li @click="openEditor()" v-shortkey="['ctrl', 'n']" @shortkey="openEditor()">
               <Icon type="plus-round"></Icon> {{$t('p.detail.create.action')}}
             </li>

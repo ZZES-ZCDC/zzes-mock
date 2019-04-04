@@ -208,7 +208,7 @@ export default {
           this.autoClose = true
           this.temp.url = this.value.url.slice(1) // remove /
           this.temp.mode = this.value.mode
-          console.log(this.temp.params)
+          // console.log(this.temp.params)
           this.temp.method = this.value.method
           this.temp.description = this.value.description
           this.temp.params = this.value.params
@@ -217,7 +217,12 @@ export default {
           this.codeEditor.setValue(this.temp.mode)
         } else {
           this.temp.url = ''
-          this.temp.mode = '{"data": {}}'
+          // 如果项目配置了初始化模板, 则使用模板填充
+          if (JSON.stringify(project[0].template) !== '{}') {
+            this.temp.mode = JSON.stringify(project[0].template)
+          } else {
+            this.temp.mode = '{"data": {}}'
+          }
           this.temp.method = 'get'
           this.temp.description = ''
           this.temp.params = ''
