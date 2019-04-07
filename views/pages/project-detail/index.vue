@@ -73,6 +73,11 @@
             </Col>
           </Row>
         </div>
+        <Select v-model="selectTag" filterable style="width:200px;margin-bottom: 20px;" placeholder="请选择标签">
+          <Option value="">全部</Option>
+          <Option value="默认">默认</Option>
+          <Option v-for="item in tags" :value="item" :key="item">{{ item }}</Option>
+        </Select>
         <!-- 接口列表 -->
         <Table
           border
@@ -102,6 +107,7 @@ export default {
   name: 'projectDetail',
   data () {
     return {
+      selectTag: '',
       pageName: this.$t('p.detail.nav[0]'),
       selection: [],
       keywords: '',
@@ -220,17 +226,30 @@ export default {
     }, 500))
   },
   computed: {
+    tags () {
+      const id = this.$route.params.id
+      const project = this.$store.state.project.list.filter(v => {
+        return v._id === id
+      })
+      console.log(id, project, this.$store.state.project)
+      return project[0].tags
+    },
     project () {
       return this.$store.state.mock.project
     },
     list () {
       const list = this.$store.state.mock.list
       const reg = this.keywords && new RegExp(this.keywords, 'i')
-      return reg
+      let result = reg
         ? list.filter(item => (
           reg.test(item.name) || reg.test(item.url) || reg.test(item.method)
         ))
         : list
+      if (this.selectTag !== '') {
+        return result.filter(v => v.tag === this.selectTag)
+      } else {
+        return result
+      }
     },
     page () {
       return {
