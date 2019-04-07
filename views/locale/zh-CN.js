@@ -67,7 +67,7 @@ export default {
       description: '伪造数据，我们更高效 | 但，不仅于此',
       form: {
         button: '开始吧 | 登录',
-        placeholder: '用户名，没有会自动注册哦 | 密码'
+        placeholder: '邮箱，没有会自动注册哦 | 密码'
       },
       about: 'Easy Mock 是什么？| 是一个可视化，并且能快速生成模拟数据的服务。',
       feature: [
@@ -78,9 +78,10 @@ export default {
         '响应式数据 | 想要数据联动那是不可能了，不过 Easy Mock 支持响应式数据。通过判断入参返回对应的数据。',
         '语法提示 | 你也许时常忘记 Mock.js 的语法，不过没关系。现在只需要在编辑器里输入 em 就能获得相应提示。'
       ],
+      notEmail: '您的邮箱格式错误',
       confirm: {
         register: {
-          content: '该用户不存在, 是否根据当前输入的用户名和密码注册用户?注：请妥善保管好你的密码，目前无法提供找回密码的通道。',
+          content: '该用户不存在, 是否根据当前输入的邮箱和密码注册用户?注：请妥善保管好你的密码，目前无法提供找回密码的通道。',
           success: '注册成功'
         }
       }
@@ -94,6 +95,8 @@ export default {
         name: '归属 / 项目名 | 尽量简短表意。例：petstore',
         url: '项目基础 URL | 尽量简短表意。例：/nba',
         description: '项目描述 | 不填默认为项目名',
+        tag: '接口分类标签 | 可为项目内接口配置标签, 进行分类',
+        template: '初始化接口模板 | 新建接口内容替换为接口模板',
         swagger: 'Swagger Docs API | 可选 | 如果后台有提供 Swagger 文档（并且没有验证授权的问题）, 于是我们可以在此处填写 Swagger 的接口地址, Easy Mock 会自动基于此接口创建 Mock 接口.',
         member: ['邀请成员 协同编辑', '可选 | 团队项目下，该配置不生效', '用户昵称、用户名，支持模糊匹配'],
         confirm: '请输入项目名称以进行确认 | 项目名确认 | 出于某些原因，删除也许会失败。但如果你执意删除，必须知道此操作无法撤消，这将永久删除',
@@ -129,7 +132,8 @@ export default {
         passwordCheck: '确认密码',
         update: '更新资料',
         avatar: '头像',
-        upload: '上传新图片'
+        upload: '上传新图片',
+        email: '邮箱'
       },
       formatError: '文件格式不正确 | 文件 {name} 格式不正确，请上传 jpg 或 png 格式的图片。',
       updateSuccess: '更新成功 | 请重新登录，以完成数据同步。',
@@ -167,7 +171,7 @@ export default {
         { category: '导航' },
         { category: '操作', list: ['创建接口', '添加 / 移除工作台', '同步 Swagger'] }
       ],
-      columns: ['描述', '传入参数', '操作'],
+      columns: ['描述', '标签', '操作'],
       action: ['预览接口', '编辑接口', '复制接口地址', '克隆', '删除'],
       copySuccess: '接口地址已复制到剪贴板',
       syncSwagger: {
@@ -197,6 +201,7 @@ export default {
         autoClose: '自动关闭',
         paramsList: '参数列表',
         control: ['格式化', '预览', '关闭'],
+        tag: '选择标签',
         submit: {
           error: ['接口数据不能为空。', '请检查数据定义是否符合要求。'],
           updateSuccess: '更新成功'

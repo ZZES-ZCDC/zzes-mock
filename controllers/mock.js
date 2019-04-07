@@ -77,6 +77,7 @@ module.exports = class MockController {
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const method = ctx.checkBody('method').notEmpty().toLow().in(['get', 'post', 'put', 'delete', 'patch']).value
     const params = ctx.checkBody('params').notEmpty().value
+    const tag = ctx.checkBody('tag').notEmpty().value
 
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
@@ -107,7 +108,8 @@ module.exports = class MockController {
       method,
       url,
       mode,
-      params
+      params,
+      tag
     })
 
     await redis.del('project:' + projectId)
@@ -125,6 +127,7 @@ module.exports = class MockController {
     const projectId = ctx.checkQuery('project_id').notEmpty().value
     const pageSize = ctx.checkQuery('page_size').empty().toInt().gt(0).default(defPageSize).value
     const pageIndex = ctx.checkQuery('page_index').empty().toInt().gt(0).default(1).value
+    const tag = ctx.checkQuery('tag').empty().value
 
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
@@ -139,6 +142,10 @@ module.exports = class MockController {
 
     const where = {
       project: projectId
+    }
+
+    if (tag && tag !== '') {
+      where.tag = tag
     }
 
     if (keywords) {
@@ -188,6 +195,7 @@ module.exports = class MockController {
     const url = ctx.checkBody('url').notEmpty().match(/^\/.*$/i, 'URL 必须以 / 开头').value
     const method = ctx.checkBody('method').notEmpty().toLow().in(['get', 'post', 'put', 'delete', 'patch']).value
     const params = ctx.checkBody('params').notEmpty().value
+    const tag = ctx.checkBody('tag').value
     // console.log('bodyparams', params)
     if (ctx.errors) {
       ctx.body = ctx.util.refail(null, 10001, ctx.errors)
@@ -210,6 +218,7 @@ module.exports = class MockController {
     api.method = method
     api.description = description
     api.params = JSON.stringify(params)
+    api.tag = tag
     // console.log('apiparams',api.params)
     const existMock = await MockProxy.findOne({
       _id: {

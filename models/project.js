@@ -29,6 +29,14 @@ const schema = new Schema({
     ref: 'User',
     default: []
   }],
+  tags: {
+    type: Array,
+    default: ['默认']
+  },
+  template: {
+    type: Object,
+    default: {}
+  },
   create_at: {
     type: Date,
     default: Date.now

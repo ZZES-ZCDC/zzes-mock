@@ -67,7 +67,7 @@ export default {
       description: 'Mock more efficiently | ',
       form: {
         button: 'Let\'go | Login',
-        placeholder: 'Username, will register if user doesn\'t exsit | Password'
+        placeholder: 'Email, will register if user doesn\'t exsit | Password'
       },
       about: 'What is Easy Mock? | A vitrual API mock up tool, and generate mock up data.',
       feature: [
@@ -78,9 +78,10 @@ export default {
         'Responsive Data | Easy Mock suport responsive data. It reponses data based on request query parameters.',
         'Syntax Lint | Forget syntax of Mock.js? No problem. Now type em in editor for syntax lint.'
       ],
+      notEmail: 'Your Email is bad',
       confirm: {
         register: {
-          content: 'User does\'t exsit, do you want create a new user with this username and password? Notice: You cannot retrieve your password if you forget in this version',
+          content: 'User does\'t exsit, do you want create a new user with this email and password? Notice: You cannot retrieve your password if you forget in this version',
           success: 'Register Success'
         }
       }
@@ -129,7 +130,8 @@ export default {
         passwordCheck: 'Confirm password',
         update: 'Update Profile',
         avatar: 'Profile Picture',
-        upload: 'Upload New Picture'
+        upload: 'Upload New Picture',
+        email: 'Email'
       },
       formatError: 'Unsupported picture formate | {name} is not support, please upload *.jpg or *.png picture.',
       updateSuccess: 'Update Success | Please login again to check changes.',

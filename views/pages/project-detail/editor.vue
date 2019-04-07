@@ -34,13 +34,22 @@
               <Form-item :label="$t('p.detail.columns[0]')">
                 <!-- <i-input v-model="temp.description"></i-input> -->
                 <i-input type="textarea" v-model="temp.description" :autosize="{minRows: 5,maxRows: 10}" placeholder="输入请求描述"></i-input>
-              </Form-item>  
-              <!-- 是否自动关闭 -->
-              <Form-item :label="$t('p.detail.editor.autoClose')" v-if="isEdit">
-                <i-switch v-model="autoClose"></i-switch>
               </Form-item>
-             
-              
+              <Row>
+                <Col span="12">
+                  <!-- 是否自动关闭 -->
+                  <Form-item :label="$t('p.detail.editor.autoClose')" v-if="isEdit">
+                    <i-switch v-model="autoClose"></i-switch>
+                  </Form-item>
+                </Col>
+                <Col span="12">
+                  <Form-item :label="$t('p.detail.editor.tag')">
+                    <Select v-model="temp.tag" style="width:200px">
+                        <Option v-for="item in tags" :value="item" :key="item">{{ item }}</Option>
+                    </Select>
+                  </Form-item>
+                </Col>
+              </Row>
               <!-- 参数列表 get方法放在url后？，其余放于body里-->
               <Form-item :label="$t('p.detail.editor.paramsList')" >
                 <Button style="width:100%" type="ghost" @click="handleAdd"><Icon type="plus-circled" size="22"></Icon></Button>
@@ -140,8 +149,10 @@ export default {
         mode: '{"data": {}}',
         method: 'get',
         description: '',
-        params: {}
+        params: {},
+        tag: ''
       },
+      tags: [],
       index: 1,
       // 传参的form
       formDynamic: {
@@ -187,12 +198,17 @@ export default {
     'value.show': function (show) {
       document.body.style.overflow = show ? 'hidden' : 'auto'
       if (show) {
+        const id = this.$route.params.id
+        const project = this.$store.state.project.list.filter(v => {
+          return v._id === id
+        })
+        this.tags = project[0].tags
         if (this.isEdit) {
           // console.log(this.value)
           this.autoClose = true
           this.temp.url = this.value.url.slice(1) // remove /
           this.temp.mode = this.value.mode
-          console.log(this.temp.params)
+          // console.log(this.temp.params)
           this.temp.method = this.value.method
           this.temp.description = this.value.description
           this.temp.params = this.value.params
@@ -201,7 +217,12 @@ export default {
           this.codeEditor.setValue(this.temp.mode)
         } else {
           this.temp.url = ''
-          this.temp.mode = '{"data": {}}'
+          // 如果项目配置了初始化模板, 则使用模板填充
+          if (JSON.stringify(project[0].template) !== '{}') {
+            this.temp.mode = JSON.stringify(project[0].template)
+          } else {
+            this.temp.mode = '{"data": {}}'
+          }
           this.temp.method = 'get'
           this.temp.description = ''
           this.temp.params = ''

@@ -15,6 +15,9 @@
           <Row :gutter="20">
             <Col span="18">
               <Form label-position="top" :model="form" :rules="rules" ref="form">
+                <Form-item :label="$t('p.profile.form.email')">
+                  {{email}}
+                </Form-item>
                 <Form-item :label="$t('p.profile.form.language')">
                   <Select v-model="language">
                     <Option v-for="item in languageList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -84,6 +87,7 @@ export default {
       language: this.$ls.get('locale') || 'zh-CN',
       languageList: languageMap.list,
       uploadAPI: '/api/upload',
+      email: this.$store.state.user.name,
       form: {
         headImg: this.$store.state.user.headImg,
         nickName: this.$store.state.user.nickName,

@@ -14,7 +14,9 @@
       <em-add icon="arrow-up-c" :bottom="90"></em-add>
     </Back-top>
     <transition name="fade" mode="out-in">
+      <!-- 设置 -->
       <project v-if="pageName === $t('p.detail.nav[1]')" key="a" :project-data="project"></project>
+      <!-- 列表 -->
       <div
         class="em-container"
         v-if="pageAnimated && pageName === $t('p.detail.nav[0]')"
@@ -41,8 +43,10 @@
             </Col>
           </Row>
         </div>
+        <!-- 中间一排按钮 -->
         <div class="em-proj-detail__switcher">
           <ul>
+            <!-- 创建接口 -->
             <li @click="openEditor()" v-shortkey="['ctrl', 'n']" @shortkey="openEditor()">
               <Icon type="plus-round"></Icon> {{$t('p.detail.create.action')}}
             </li>
@@ -59,6 +63,7 @@
             <li @click="download"><Icon type="code-download"></Icon> {{$tc('p.detail.download', 1)}}</li>
           </ul>
         </div>
+        <!-- 项目成员 -->
         <div class="em-proj-detail__members" v-if="project.members.length">
           <em-spots :size="6"></em-spots>
           <h2><Icon type="person-stalker"></Icon> {{$t('p.detail.member')}}</h2>
@@ -68,6 +73,12 @@
             </Col>
           </Row>
         </div>
+        <Select v-model="selectTag" filterable style="width:200px;margin-bottom: 20px;" placeholder="请选择标签">
+          <Option value="">全部</Option>
+          <Option value="默认">默认</Option>
+          <Option v-for="item in tags" :value="item" :key="item">{{ item }}</Option>
+        </Select>
+        <!-- 接口列表 -->
         <Table
           border
           :columns="columns"
@@ -96,6 +107,7 @@ export default {
   name: 'projectDetail',
   data () {
     return {
+      selectTag: '',
       pageName: this.$t('p.detail.nav[0]'),
       selection: [],
       keywords: '',
@@ -167,7 +179,15 @@ export default {
         },
         { title: 'URL', width: 220, ellipsis: true, sortable: true, key: 'url' },
         { title: this.$t('p.detail.columns[0]'), ellipsis: true, key: 'description' },
-        // { title: this.$t('p.detail.columns[1]'), width: 220, ellipsis: false, key: 'params' },
+        {
+          title: this.$t('p.detail.columns[1]'),
+          width: 100,
+          ellipsis: false,
+          key: 'tag',
+          render: (h, params) => {
+            return <tag color="green">{params.row.tag}</tag>
+          }
+        },
         {
           title: this.$t('p.detail.columns[2]'),
           key: 'action',
@@ -206,17 +226,30 @@ export default {
     }, 500))
   },
   computed: {
+    tags () {
+      const id = this.$route.params.id
+      const project = this.$store.state.project.list.filter(v => {
+        return v._id === id
+      })
+      console.log(id, project, this.$store.state.project)
+      return project[0].tags
+    },
     project () {
       return this.$store.state.mock.project
     },
     list () {
       const list = this.$store.state.mock.list
       const reg = this.keywords && new RegExp(this.keywords, 'i')
-      return reg
+      let result = reg
         ? list.filter(item => (
           reg.test(item.name) || reg.test(item.url) || reg.test(item.method)
         ))
         : list
+      if (this.selectTag !== '') {
+        return result.filter(v => v.tag === this.selectTag)
+      } else {
+        return result
+      }
     },
     page () {
       return {
