@@ -148,7 +148,7 @@ $ [sudo] npm install pm2 -g
 $ NODE_ENV=production pm2 start app.js
 ```
 
-## [@nostarsnow](https://github.com/nostarsnow) 增加功能截图
+## 增加功能截图
 
 ### 1. 入参required
 ![编辑页](https://wx4.sinaimg.cn/mw690/4d227521ly1g1jiga6urxj20kp0jbjrn.jpg)
@@ -158,3 +158,12 @@ $ NODE_ENV=production pm2 start app.js
 
 ### 3. 预览页根据入参配置, 自动生成参数
 ![预览页](http://wx3.sinaimg.cn/mw690/4d227521ly1g1jige7t7aj20m80jqt8u.jpg)
+
+### 4. 配置项目标签和接口初始化mock
+![](https://s2.ax1x.com/2019/04/07/Af6zRA.png)
+
+### 5. 接口标签配置
+![](https://s2.ax1x.com/2019/04/07/AfqNSx.png)
+
+### 6. 接口标签筛选
+![](https://s2.ax1x.com/2019/04/07/AfcSxI.png)
