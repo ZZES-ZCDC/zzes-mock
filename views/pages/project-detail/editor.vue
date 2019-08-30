@@ -212,6 +212,7 @@ export default {
           this.temp.method = this.value.method
           this.temp.description = this.value.description
           this.temp.params = this.value.params
+          this.temp.tag = this.value.tag
           // console.log(this.temp.params)
           this.setParams(this.value.params) // 填充数据列表
           this.codeEditor.setValue(this.temp.mode)
@@ -226,6 +227,7 @@ export default {
           this.temp.method = 'get'
           this.temp.description = ''
           this.temp.params = ''
+          this.temp.tag = this.tags[0]
           this.setParams(this.value.params)
           this.codeEditor.setValue(this.temp.mode)
         }
@@ -288,6 +290,7 @@ export default {
             this.value.method = this.temp.method
             this.value.description = this.temp.description
             this.value.params = JSON.stringify(this.temp.params)
+            this.value.tag = this.temp.tag
             if (this.autoClose) this.close()
           }
         })
