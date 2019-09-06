@@ -280,6 +280,9 @@ export default {
       })
     },
     closeTag (event, name) {
+      if (name === '默认') {
+        this.$Message.error('默认标签不可删除')
+      }
       const index = this.form.projectTags.indexOf(name)
       this.form.projectTags.splice(index, 1)
     },

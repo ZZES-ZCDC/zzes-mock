@@ -54,29 +54,31 @@
               <Form-item :label="$t('p.detail.editor.paramsList')" >
                 <Button style="width:100%" type="ghost" @click="handleAdd"><Icon type="plus-circled" size="22"></Icon></Button>
                 <div class="box">
-                  <div v-for="(item, index) in formDynamic.items" :key="index" v-if="item.status">
-                    <Row :gutter="3">
-                      <Col span="5">
-                        <Input type="text" v-model="item.value" placeholder="参数名称"/>
-                      </Col>
-                      <Col span="5">
-                        <i-select v-model="item.paramType" placeholder="请选择参数类型">
-                          <Option v-for="item in paramTypes" :value="item.type" :key="item.type">{{ item.type }}</Option>
-                        </i-select>
-                      </Col>
-                      <Col span="9" >
-                        <Input type="text" v-model="item.info" placeholder="参数说明"/>
-                      </Col>
-                      <Col span="3" center>
-                        <i-switch v-model="item.required">
-                          <span slot="open">必</span>
-                          <span slot="close">非</span>
-                        </i-switch>
-                      </Col>
-                      <Col span="2">
-                        <Button type="ghost" @click="handleRemove(index)"><Icon type="android-remove-circle" size="22"></Icon></Button>
-                      </Col>
-                    </Row>
+                  <div v-for="(item, index) in formDynamic.items" :key="index">
+                    <template v-if="item.status">
+                      <Row :gutter="3">
+                        <Col span="5">
+                          <Input type="text" v-model="item.value" placeholder="参数名称"/>
+                        </Col>
+                        <Col span="5">
+                          <i-select v-model="item.paramType" placeholder="请选择参数类型">
+                            <Option v-for="item in paramTypes" :value="item.type" :key="item.type">{{ item.type }}</Option>
+                          </i-select>
+                        </Col>
+                        <Col span="9" >
+                          <Input type="text" v-model="item.info" placeholder="参数说明"/>
+                        </Col>
+                        <Col span="3" center>
+                          <i-switch v-model="item.required">
+                            <span slot="open">必</span>
+                            <span slot="close">非</span>
+                          </i-switch>
+                        </Col>
+                        <Col span="2">
+                          <Button type="ghost" @click="handleRemove(index)"><Icon type="android-remove-circle" size="22"></Icon></Button>
+                        </Col>
+                      </Row>
+                    </template>
                   </div>         
                 </div>
                 <!-- <Button type="ghost" @click="getParams">push</Button> -->
@@ -202,7 +204,11 @@ export default {
         const project = this.$store.state.project.list.filter(v => {
           return v._id === id
         })
-        this.tags = project[0].tags
+        if (project && project.length > 0) {
+          this.tags = project[0].tags
+        } else {
+          this.tags = ['默认']
+        }
         if (this.isEdit) {
           // console.log(this.value)
           this.autoClose = true
@@ -212,13 +218,14 @@ export default {
           this.temp.method = this.value.method
           this.temp.description = this.value.description
           this.temp.params = this.value.params
+          this.temp.tag = this.value.tag
           // console.log(this.temp.params)
           this.setParams(this.value.params) // 填充数据列表
           this.codeEditor.setValue(this.temp.mode)
         } else {
           this.temp.url = ''
           // 如果项目配置了初始化模板, 则使用模板填充
-          if (JSON.stringify(project[0].template) !== '{}') {
+          if (project && project.length > 0 && JSON.stringify(project[0].template) !== '{}') {
             this.temp.mode = JSON.stringify(project[0].template)
           } else {
             this.temp.mode = '{"data": {}}'
@@ -226,6 +233,7 @@ export default {
           this.temp.method = 'get'
           this.temp.description = ''
           this.temp.params = ''
+          this.temp.tag = this.tags[0]
           this.setParams(this.value.params)
           this.codeEditor.setValue(this.temp.mode)
         }
@@ -288,11 +296,13 @@ export default {
             this.value.method = this.temp.method
             this.value.description = this.temp.description
             this.value.params = JSON.stringify(this.temp.params)
+            this.value.tag = this.temp.tag
             if (this.autoClose) this.close()
           }
         })
       } else {
         this.temp.params = JSON.stringify(this.getParams())
+        console.log(this.temp)
         // 若不是更新，则创建
         this.$store.dispatch('mock/CREATE', {
           route: this.$route,
