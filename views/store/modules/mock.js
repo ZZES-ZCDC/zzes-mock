@@ -39,7 +39,7 @@ export default {
         }
       })
     },
-    CREATE ({commit, dispatch}, {route, mode, description, url, method, params}) {
+    CREATE ({commit, dispatch}, {route, mode, description, url, method, params, tag}) {
       return api.mock.create({
         data: {
           mode,
@@ -47,6 +47,7 @@ export default {
           method,
           description,
           params,
+          tag,
           project_id: route.params.id
         }
       }).then((res) => {

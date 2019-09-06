@@ -232,7 +232,11 @@ export default {
         return v._id === id
       })
       console.log(id, project, this.$store.state.project)
-      return project[0].tags
+      if (project && project.length > 0) {
+        return project[0].tags
+      } else {
+        return []
+      }
     },
     project () {
       return this.$store.state.mock.project
@@ -245,7 +249,7 @@ export default {
           reg.test(item.name) || reg.test(item.url) || reg.test(item.method)
         ))
         : list
-      if (this.selectTag !== '') {
+      if (this.selectTag) {
         return result.filter(v => v.tag === this.selectTag)
       } else {
         return result
